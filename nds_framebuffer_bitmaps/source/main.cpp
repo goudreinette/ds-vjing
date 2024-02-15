@@ -1,3 +1,8 @@
+#include <random>
+#include "../../effolkronium/random.hpp"
+
+
+// Screen stuff -------------------------------------------------
 typedef volatile unsigned int vu32;
 typedef unsigned short u16;
 typedef volatile unsigned short vu16;
@@ -26,8 +31,12 @@ void waitForVblank() {
 
 
 
+// Random --------------------------------------------------------
+using Random = effolkronium::random_static;
 
-// The ball
+
+
+// The ball ------------------------------------------------------
 typedef struct BALL{
     int row;
     int col;
@@ -99,19 +108,25 @@ void update() {
 }
 
 void draw() {
+    // slightly erase everything 
+    // int randomPixel = Random::get(0, SCREENHEIGHT*SCREENWIDTH);
+    // for (int i=0; i<200; i++) {
+    //     VRAM_A[randomPixel] = COLOR(31,31,31);
+    // }
+    
+    // slowwww
+    for (int i=0; i<SCREENHEIGHT*SCREENWIDTH; i++) {
+        // chance of 5%
+        if (rand()%20 == 0) {
+            VRAM_A[i] = COLOR(0,0,0);
+        }
+    }
+
     // erase the ball
-    drawRect(old_ball.row,
-                   old_ball.col,
-                   old_ball.size,
-                   old_ball.size,
-                   0);
+    // drawRect(old_ball.row, old_ball.col, old_ball.size, old_ball.size, 0);
 
     // draw it in its new position
-    drawRect(ball.row,
-                   ball.col,
-                   ball.size,
-                   ball.size,
-                   ball.color);
+    drawRect(ball.row, ball.col, ball.size, ball.size, ball.color);
 }
 
 
