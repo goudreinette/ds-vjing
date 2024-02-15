@@ -11,6 +11,7 @@ typedef volatile unsigned char vu8;
 #define VRAM_ENABLE       (1<<7)
 #define SCANLINECOUNTER   *(vu16 *)0x4000006
 
+// COLOR uses numbers from (0-31) for each of the RGB components
 #define COLOR(r,g,b)  ((r) | (g)<<5 | (b)<<10)
 #define OFFSET(r,c,w) ((r)*(w)+(c))
 
@@ -18,13 +19,12 @@ typedef volatile unsigned char vu8;
 #define SCREENHEIGHT (192)
 
 
-// function definitions
-// void setPixel(int row, int col, u16 color);
-// void drawRect(int row, int col, int width, int height, u16 color);
-// void initialize_ball();
-// void update();
-// void draw();
-// void waitForVblank();
+void waitForVblank() {
+    while (SCANLINECOUNTER > SCREENHEIGHT);
+    while (SCANLINECOUNTER < SCREENHEIGHT);
+}
+
+
 
 
 // The ball
@@ -46,9 +46,32 @@ void initialize_ball() {
     ball.size = 5;
     ball.rdel= 1;
     ball.cdel = 2;
-    ball.color = COLOR(15,27,7);
+    ball.color = COLOR(31,31,31);
 }
 
+
+
+
+
+// Drawing functions --------------------------------------------
+void setPixel(int row, int col, u16 color) {
+    VRAM_A[OFFSET(row, col, SCREENWIDTH)] = color;
+}
+
+void drawRect(int row, int col, int width, int height, u16 color) {
+    int r, c;
+    for (c=col; c<col+width; c++) {
+        for (r=row; r<row+height; r++) {
+            setPixel(r, c, color);
+        }
+    }
+}
+
+
+
+
+
+// Main routines ------------------------------------------------
 void update() {
     old_ball = ball;
 
@@ -75,22 +98,6 @@ void update() {
     }
 }
 
-
-
-// Drawing functions 
-void setPixel(int row, int col, u16 color) {
-    VRAM_A[OFFSET(row, col, SCREENWIDTH)] = color;
-}
-
-void drawRect(int row, int col, int width, int height, u16 color) {
-    int r, c;
-    for (c=col; c<col+width; c++) {
-        for (r=row; r<row+height; r++) {
-            setPixel(r, c, color);
-        }
-    }
-}
-
 void draw() {
     // erase the ball
     drawRect(old_ball.row,
@@ -108,16 +115,7 @@ void draw() {
 }
 
 
-void waitForVblank() {
-    while (SCANLINECOUNTER > SCREENHEIGHT);
-    while (SCANLINECOUNTER < SCREENHEIGHT);
-}
-
-
-
-
 int main(void) {
-
     // Set the main diplay to frame buffer mode 0 (FB0).
     // In FB0 VRAM A is drawn to the screen.
     REG_DISPCNT_MAIN = MODE_FB0;
