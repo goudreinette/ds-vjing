@@ -1,8 +1,10 @@
 {
     "files.associations": {
+        "*.embeddedhtml": "html",
         "vector": "cpp",
         "filesystem": "cpp",
-        "cmath": "cpp"
+        "cmath": "cpp",
+        "random": "cpp"
     },
     "terminal.integrated.defaultProfile.windows": "MSYS2",
     "terminal.integrated.profiles.windows": {
