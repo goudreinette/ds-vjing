@@ -1,7 +1,9 @@
 #include <nds.h>
 #include "screen_utils.h"
 #include "scene.h"
+#include "math.h"
 #include "../../effolkronium/random.hpp"
+
 
 
 class FirstSketch : public Scene
@@ -86,15 +88,19 @@ public:
             ball.col = 0;
             ball.cdel *= -1;
         }
+
+        
     }
 
 
     void draw() {
 
         // slightly erase everything 
+        int countOfPalette = std::size(palette);
+
         for (int i=0; i<100; i++) {
             int randomPixel = Random::get(0, SCREENHEIGHT*SCREENWIDTH);
-            int randomColor = Random::get(0, 9);
+            int randomColor = Random::get(0, countOfPalette);
             VRAM_A[randomPixel] = palette[randomColor];
             // VRAM_A[randomPixel] = COLOR(0,0,0);
             // VRAM_A[randomPixel] = i % 2 == 0 ? COLOR(0,0,0) : COLOR(31,31,31)
