@@ -162,6 +162,7 @@ int main(int argc, char **argv)
             NF_SetTileOfMap(1, 2, rand() % 64, rand() % 64, rand() % 16);
         }
 
+        NF_UpdateVramMap(0, 3);
         NF_UpdateVramMap(1, 2);
 
         // Print the color of the tile under the pointer
