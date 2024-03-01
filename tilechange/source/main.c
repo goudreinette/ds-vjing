@@ -57,6 +57,7 @@ int main(int argc, char **argv)
 
     // Create top screen background
     NF_CreateTiledBg(0, 3, "moon");
+    NF_CreateTiledBg(0, 2, "tiles");
 
     // Create bottom screen backgrounds
     NF_CreateTiledBg(1, 3, "moon");
@@ -77,8 +78,23 @@ int main(int argc, char **argv)
     s16 x = 128;
     s16 y = 96;
 
+
+    // for each tile
+    for (int i = 0; i < 64; i++)
+    {
+        for (int j = 0; j < 64; j++)
+        {
+            // NF_SetTileOfMap(1, 2, i, j, 2);
+            NF_SetTileOfMap(1, 2, i, j, rand() % 8);
+        }
+    }
+
+    int t = 0;
+
     while (1)
     {
+        t++;
+
         // Read keys
         scanKeys();
         u16 keys = keysHeld();
@@ -136,6 +152,14 @@ int main(int argc, char **argv)
             NF_SetTileOfMap(1, 2, x / 8, y / 8, 2);
         if (keys & KEY_X)
             NF_SetTileOfMap(1, 2, x / 8, y / 8, 3);
+
+
+
+        for (int i = 0; i < 128; i++)
+        {
+            NF_SetTileOfMap(0, 2, rand() % 32, rand() % 32, rand() % 16);
+            NF_SetTileOfMap(1, 2, rand() % 64, rand() % 64, rand() % 16);
+        }
 
         NF_UpdateVramMap(1, 2);
 
