@@ -29,6 +29,7 @@ public:
 		//allocate a vram bank for each display
 		vramSetBankA(VRAM_A_MAIN_BG);
 		vramSetBankC(VRAM_C_SUB_BG);
+		vramSetBankH(VRAM_H_SUB_BG);
 
 		//create a background on each display
 		int bgMain = bgInit(3, BgType_Bmp16, BgSize_B16_256x256, 0,0);
@@ -37,15 +38,20 @@ public:
 		videoMemoryMain = bgGetGfxPtr(bgMain);
 		videoMemorySub = bgGetGfxPtr(bgSub);
 
-		// printf("videoMemoryMain: %p\n", videoMemoryMain);
+		// create a console on background 2
+		// PrintConsole bottomScreen;
+		// consoleInit(&bottomScreen, 1, BgType_Text4bpp, BgSize_T_256x256, *videoMemorySub, 0, false, true);
+		// consoleSelect(&bottomScreen);
 
 		//initialize it with a color
-		for(x = 0; x < 256; x++)
-			for(y = 0; y < 256; y++)
-			{
+		for(x = 0; x < 256; x++) {
+			for(y = 0; y < 256; y++) {
 				setPixelGfx(videoMemoryMain, x, y, ARGB16(1, 31, 0, 0));
 				setPixelGfx(videoMemorySub, x, y, ARGB16(1, 0, 0, 31));
 			}
+		}
+
+		// printf("Backgrounds");
     }
 
 
@@ -61,7 +67,7 @@ public:
 			int color = Random::get(0, 31);
 			setPixelGfx(videoMemoryMain, x, y, ARGB16(1, color, color, color));
 
-			setPixelGfx(videoMemorySub, x, y, ARGB16(1, color, color, color));
+			// setPixelGfx(videoMemorySub, x, y, ARGB16(1, color, color, color));
 		}
     }
 };

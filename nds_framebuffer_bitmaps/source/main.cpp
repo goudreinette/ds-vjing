@@ -25,7 +25,7 @@ Scene* scenes[] = {
 };
 
 int currentSceneIndex = 6;
-int numScenes = 6;
+int numScenes = 7;
 
 
 void setupBottomScreen() {
