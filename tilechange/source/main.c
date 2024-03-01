@@ -85,11 +85,12 @@ int main(int argc, char **argv)
         for (int j = 0; j < 64; j++)
         {
             // NF_SetTileOfMap(1, 2, i, j, 2);
-            NF_SetTileOfMap(1, 2, i, j, rand() % 8);
+            // NF_SetTileOfMap(1, 2, i, j, rand() % 8);
         }
     }
 
     int t = 0;
+    int tilenum_2 = 0;
 
     while (1)
     {
@@ -99,10 +100,18 @@ int main(int argc, char **argv)
         scanKeys();
         u16 keys = keysHeld();
 
-        if (keys & KEY_UP)
+        if (keys & KEY_UP) {
+            if (t%10 == 0) {
+                tilenum_2--;
+            }
             y--;
-        if (keys & KEY_DOWN)
-            y++;
+        }
+        if (keys & KEY_DOWN) {
+            if (t%10 == 0) {
+                tilenum_2++;    
+            }
+            y++;    
+        }
 
         if (keys & KEY_LEFT)
             x--;
@@ -157,32 +166,33 @@ int main(int argc, char **argv)
 
         for (int i = 0; i < 128; i++)
         {
-            NF_SetTileOfMap(0, 3, rand() % 32, rand() % 32, rand() % 32);
-            NF_SetTileOfMap(0, 2, rand() % 32, rand() % 32, rand() % 16);
-            NF_SetTileOfMap(1, 2, rand() % 64, rand() % 64, rand() % 16);
+            // NF_SetTileOfMap(0, 3, rand() % 64, rand() % 64, rand() % 32);
+            // NF_SetTileOfMap(0, 2, rand() % 32, rand() % 32, rand() % 16);
+            NF_SetTileOfMap(1, 2, rand() % 64, rand() % 64, 25);
         }
+
+
+        // For demos
+        // for (int i = 0; i < 64; i++)
+        // {
+        //     for (int j = 0; j < 64; j++)
+        //     {
+        //         // NF_SetTileOfMap(1, 2, i, j, 2);
+        //         // NF_SetTileOfMap(1, 2, i, j, rand() % 8);
+        //         NF_SetTileOfMap(1, 2, i, j, tilenum_2);
+        //     }
+        // }
+
 
         NF_UpdateVramMap(0, 3);
         NF_UpdateVramMap(1, 2);
 
         // Print the color of the tile under the pointer
         int tilenum = NF_GetTileOfMap(1, 2, x / 8, y / 8);
-        switch (tilenum)
-        {
-            case 0:
-                sprintf(mytext,"Tile: Vacio / Void / %d   ", tilenum);
-                break;
-            case 1:
-                sprintf(mytext,"Tile: Azul / Blue / %d   ", tilenum);
-                break;
-            case 2:
-                sprintf(mytext,"Tile: Verde / Green / %d   ", tilenum);
-                break;
-            case 3:
-                sprintf(mytext,"Tile: Rojo / Red / %d   ", tilenum);
-                break;
-        }
 
+        sprintf(mytext," %d   ", tilenum);
+
+     
         NF_WriteText(0, 2, 1, 3, mytext);
 
         // Update text layers
