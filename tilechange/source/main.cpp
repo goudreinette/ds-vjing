@@ -97,17 +97,6 @@ void setupGraphics() {
     setupText();
 }
 
-
-void fillRandomTiles() {
-    for (int i = 0; i < 64; i++) {
-        for (int j = 0; j < 64; j++) {
-            NF_SetTileOfMap(0, tilesTopLayer, i, j, 2);
-            NF_SetTileOfMap(1, tilesBottomLayer, i, j, rand() % 8);
-        }
-    }
-}
-
-
 /*
 |--------------------------------------------------------------------------
 | Update
@@ -166,11 +155,28 @@ void updateMapScroll(int keys) {
 }
 
 
-void randomizeSomeTiles() {
-    for (int i = 0; i < 128; i++) {
-        NF_SetTileOfMap(0, tilesTopLayer, rand() % 32, rand() % 32, rand() % 16);
-        NF_SetTileOfMap(1, tilesBottomLayer, rand() % 64, rand() % 32, rand() % 64); //25
+
+void fillRandomTiles() {
+    for (int i = 0; i < 32; i++) {
+        for (int j = 0; j < 32; j++) {
+            NF_SetTileOfMap(0, tilesTopLayer, i, j, rand() % 16);
+            NF_SetTileOfMap(1, tilesBottomLayer, i, j, rand() % 16 + 25); //25
+            // NF_SetTileOfMap(0, tilesTopLayer, i, j, rand() % 64);
+            // NF_SetTileOfMap(1, tilesBottomLayer, i, j, rand() % 64);
+        }
     }
+}
+
+void randomizeSomeTiles(int amount = 128) {
+    for (int i = 0; i < amount; i++) {
+        NF_SetTileOfMap(0, tilesTopLayer, rand() % 32, rand() % 32, rand() % 16);
+        NF_SetTileOfMap(1, tilesBottomLayer, rand() % 32, rand() % 32, rand() % 24 + 32); //25
+        // NF_SetTileOfMap(1, tilesBottomLayer, rand() % 64, rand() % 32, rand() % 64); //25
+    }
+}
+
+void fillChanceEmpty(int chance = 50) {
+
 }
 
 void printCursorPositionAndTileUnderCursor() {
@@ -186,6 +192,12 @@ void printCursorPositionAndTileUnderCursor() {
 }
 
 
+void updateBothVramMaps() {
+    NF_UpdateVramMap(0, tilesTopLayer);
+    NF_UpdateVramMap(1, tilesBottomLayer);
+}
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -195,8 +207,10 @@ void printCursorPositionAndTileUnderCursor() {
 int main(int argc, char **argv)
 {
     setupGraphics();
-    fillRandomTiles();
-
+    // fillRandomTiles();
+    // randomizeSo/meTiles();
+    
+    // updateBothVramMaps();
 
     while (true) {
         t++;
@@ -207,25 +221,23 @@ int main(int argc, char **argv)
 
 
         // Change the tile under the pointer if the user presses a button
-        randomizeSomeTiles();
-
-        NF_UpdateVramMap(0, tilesTopLayer);
-        NF_UpdateVramMap(1, tilesBottomLayer);
+        randomizeSomeTiles(25);
+        updateBothVramMaps();
 
 
-        // Text
+
         printCursorPositionAndTileUnderCursor();
 
         // Update text layers
         NF_UpdateTextLayers();
 
-        // Update OAM array
-        NF_SpriteOamSet(1);
+        // // Update OAM array
+        // NF_SpriteOamSet(1);
 
         // Wait for the screen refresh
         swiWaitForVBlank();
 
-        // Update OAM
-        oamUpdate(&oamSub);
+        // // Update OAM
+        // oamUpdate(&oamSub);
     }
 }
