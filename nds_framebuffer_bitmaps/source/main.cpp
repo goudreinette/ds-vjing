@@ -4,6 +4,7 @@
 #include "4_pico_palette.cpp"
 #include "5_perlin.cpp"
 #include "6_chars.cpp"
+#include "7_backgrounds.cpp"
 
 FirstSketch first_sketch;
 SecondSketch second_sketch;
@@ -11,6 +12,7 @@ WithSprites with_sprites;
 PicoPalette pico_palette;
 PerlinScene perlin_scene;
 CharsScene chars_scene;
+BackgroundsScene backgrounds_scene;
 
 Scene* scenes[] = {
     &first_sketch, 
@@ -18,10 +20,11 @@ Scene* scenes[] = {
     &with_sprites, 
     &pico_palette,
     &perlin_scene,
-    &chars_scene
+    &chars_scene,
+    &backgrounds_scene
 };
 
-int currentSceneIndex = 5;
+int currentSceneIndex = 6;
 int numScenes = 6;
 
 

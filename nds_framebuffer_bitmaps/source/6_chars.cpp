@@ -14,14 +14,28 @@ class CharsScene : public Scene
 
     using Random = effolkronium::random_static;
 
+	int w = 32;
+
+	touchPosition touch;
+	PrintConsole topScreen;
+	PrintConsole bottomScreen;
+
+	// 24 * 32
+	const static int screenWidthChars = 32;
+	const static int screenHeightChars = 24;
+	const int numChars = screenWidthChars * screenHeightChars;
+	char* text[screenWidthChars*screenHeightChars];	
 
 public:
     void setup() {
-        consoleDemoInit();
+		videoSetMode(MODE_0_2D);
+		videoSetModeSub(MODE_0_2D);
 
-        // PrintConsole* console = consoleInit(NULL, 0, BgType_Text4bpp, BgSize_T_256x256, 8, 0, true, true);
-        // consoleSelect(console);
-        // consoleInit(NULL, 3, BgType_Text4bpp, BgSize_T_256x256, 8, 0, true, true);
+		vramSetBankA(VRAM_A_MAIN_BG);
+		vramSetBankC(VRAM_C_SUB_BG);
+
+		consoleInit(&topScreen, 3,BgType_Text4bpp, BgSize_T_256x256, 31, 0, true, true);
+		consoleInit(&bottomScreen, 3,BgType_Text4bpp, BgSize_T_256x256, 31, 0, false, true);
     }
 
 
@@ -33,13 +47,23 @@ public:
     void draw() {
         t++;
 
-        if (t % 10000 == 0) {
-            printf("PARRALLEL PROBLEMSPARRALLEL PROB");
-        }
 
-        if (t % 300000 == 1000) {
-            consoleClear();
-        }
+		// BOTTOM SCREEN 
+		consoleSelect(&bottomScreen);
+
+		for (int x = 0; x < screenWidthChars; x++) {
+			for (int y = 0; y < screenHeightChars; y++) {
+				int location = x*y;
+				const char * character =  t % numChars == location ? "X" : "O";
+				text[location] = (char*)character;
+			}
+		}
+
+		consoleClear();
+		printf(*text);
+
         
+
+		swiWaitForVBlank();
     }
 };

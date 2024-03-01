@@ -41,6 +41,11 @@ static void setPixel(int row, int col, u16 color) {
     VRAM_A[OFFSET(row, col, SCREENWIDTH)] = color;
 }
 
+static void setPixelGfx(u16* videoMem, int row, int col, u16 color) {
+    videoMem[OFFSET(col, row, SCREENWIDTH)] = color;
+}
+
+
 
 static void rect(int row, int col, int width, int height, u16 color) {
     int r, c;

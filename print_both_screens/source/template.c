@@ -30,14 +30,18 @@ int main(void) {
 	iprintf("\twww.drunkencoders.com\n");
 	iprintf("\twww.devkitpro.org");
 
+	int t = 0;
+	int w = 32;
+	int h = 24;
+
 	consoleSelect(&bottomScreen);
 
 	while(1) {
 
 		touchRead(&touch);
 		
-		iprintf("\x1b[10;0HTouch x = %04i, %04i\n", touch.rawx, touch.px);
-		iprintf("Touch y = %04i, %04i\n", touch.rawy, touch.py);
+		// iprintf("\x1b[10;0HTouch x = %04i, %04i\n", touch.rawx, touch.px);
+		// iprintf("Touch y = %04i, %04i\n", touch.rawy, touch.py);
 
 		swiWaitForVBlank();
 		scanKeys();
@@ -45,6 +49,14 @@ int main(void) {
 		int keys = keysDown();
 
 		if(keys & KEY_START) break;
+
+		for (int i = 0; i < w; i++) {
+			for (int j = 0; j < h; j++) {
+				// set color
+				printf("X");
+			}
+		}
+
 
 	}
 
