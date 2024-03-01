@@ -44,8 +44,9 @@ int main(int argc, char **argv)
     NF_InitTextSys(0);          // Top screen
 
     // Load background files from NitroFS
-    NF_LoadTiledBg("bg/layer3", "moon", 256, 256);
+    NF_LoadTiledBg("bg/layer3-copy", "moon", 256, 256);
     NF_LoadTiledBg("bg/colmap", "boxes", 768, 512);
+    NF_LoadTiledBg("bg/tiles", "tiles", 768, 512);
 
     // Load sprite files from NitroFS
     NF_LoadSpriteGfx("sprite/pointer", 0, 8, 8);
@@ -59,7 +60,7 @@ int main(int argc, char **argv)
 
     // Create bottom screen backgrounds
     NF_CreateTiledBg(1, 3, "moon");
-    NF_CreateTiledBg(1, 2, "boxes");
+    NF_CreateTiledBg(1, 2, "tiles");
 
     // Create a text layer
     NF_CreateTextLayer(0, 2, 0, "normal");
