@@ -176,7 +176,19 @@ void randomizeSomeTiles(int amount = 128) {
 }
 
 void fillChanceEmpty(int chance = 50) {
+    for (int i = 0; i < 128; i++) {
+        bool empty;
 
+        if (rand() % 100 > chance) {
+            empty = true;
+        } else {
+            empty = false;
+        }
+
+        NF_SetTileOfMap(0, tilesTopLayer, rand() % 32, rand() % 32, empty ? 0 : rand() % 16);
+        NF_SetTileOfMap(1, tilesBottomLayer, rand() % 32, rand() % 32, empty ? 0 : rand() % 24 + 32); //25
+        // NF_SetTileOfMap(1, tilesBottomLayer, rand() % 64, rand() % 32, rand() % 64); //25
+    }
 }
 
 void printCursorPositionAndTileUnderCursor() {
@@ -219,9 +231,16 @@ int main(int argc, char **argv)
         scanKeys();
         u16 keys = keysHeld();
 
+        // Read touch screen
+        touchPosition touch;
+        touchRead(&touch);
+
+        int emptyChance = touch.py;
+        fillChanceEmpty(emptyChance);
+
 
         // Change the tile under the pointer if the user presses a button
-        randomizeSomeTiles(25);
+        // randomizeSomeTiles(25);
         updateBothVramMaps();
 
 
