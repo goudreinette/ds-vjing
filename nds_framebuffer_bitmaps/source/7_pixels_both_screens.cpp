@@ -6,10 +6,7 @@
 
 
 
-#define A
-
-
-class BackgroundsScene : public Scene
+class PixelsBothScreensScene : public Scene
 {
     int t = 0;
 
@@ -17,6 +14,12 @@ class BackgroundsScene : public Scene
 	
 	u16* videoMemoryMain;
 	u16* videoMemorySub;
+
+	u16* videoMemoryMain3;
+	u16* videoMemorySub3;
+
+	int bgMain, bgMain3;
+	int bgSub, bgSub3;
 
 public:
     void setup() {
@@ -32,16 +35,18 @@ public:
 		vramSetBankH(VRAM_H_SUB_BG);
 
 		//create a background on each display
-		int bgMain = bgInit(3, BgType_Bmp16, BgSize_B16_256x256, 0,0);
-		int bgSub = bgInitSub(3, BgType_Bmp16, BgSize_B16_256x256, 0,0);
+		bgMain = bgInit(2, BgType_Bmp16, BgSize_B16_256x256, 0,0);
+		int bgSub = bgInitSub(2, BgType_Bmp16, BgSize_B16_256x256, 0,0);
+
+		bgMain3 = bgInit(3, BgType_Bmp16, BgSize_B16_256x256, 0,0);
+		int bgSub3 = bgInitSub(3, BgType_Bmp16, BgSize_B16_256x256, 0,0);
 
 		videoMemoryMain = bgGetGfxPtr(bgMain);
 		videoMemorySub = bgGetGfxPtr(bgSub);
 
-		// create a console on background 2
-		// PrintConsole bottomScreen;
-		// consoleInit(&bottomScreen, 1, BgType_Text4bpp, BgSize_T_256x256, *videoMemorySub, 0, false, true);
-		// consoleSelect(&bottomScreen);
+		videoMemoryMain3 = bgGetGfxPtr(bgMain3);
+		videoMemorySub3 = bgGetGfxPtr(bgSub3);
+
 
 		//initialize it with a color
 		for(x = 0; x < 256; x++) {
@@ -61,13 +66,20 @@ public:
 
 
     void draw() {
+		u16 keys = keysCurrent();
+
         for (int i = 0; i < 256; i++) {
 			int x = Random::get(0, 256);
 			int y = Random::get(0, 192);
 			int color = Random::get(0, 31);
-			setPixelGfx(videoMemoryMain, x, y, ARGB16(1, color, color, color));
-
-			// setPixelGfx(videoMemorySub, x, y, ARGB16(1, color, color, color));
+		
+			if (keys & KEY_RIGHT) {
+				// bgHide(bgMain3);
+				setPixelGfx(videoMemoryMain3, x, y, ARGB16(1, color, color, color));
+			} else if (keys & KEY_LEFT) {
+				// bgShow(bgMain3);
+				setPixelGfx(videoMemorySub, x, y, ARGB16(1, color, color, color));	
+			}
 		}
     }
 };
