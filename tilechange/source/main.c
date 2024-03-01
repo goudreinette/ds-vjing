@@ -56,8 +56,8 @@ int main(int argc, char **argv)
     NF_LoadTextFont("fnt/default", "normal", 256, 256, 0);
 
     // Create top screen background
-    NF_CreateTiledBg(0, 3, "moon");
-    NF_CreateTiledBg(0, 2, "tiles");
+    // NF_CreateTiledBg(0, 3, "moon");
+    NF_CreateTiledBg(0, 3, "tiles");
 
     // Create bottom screen backgrounds
     NF_CreateTiledBg(1, 3, "moon");
@@ -157,6 +157,7 @@ int main(int argc, char **argv)
 
         for (int i = 0; i < 128; i++)
         {
+            NF_SetTileOfMap(0, 3, rand() % 32, rand() % 32, rand() % 32);
             NF_SetTileOfMap(0, 2, rand() % 32, rand() % 32, rand() % 16);
             NF_SetTileOfMap(1, 2, rand() % 64, rand() % 64, rand() % 16);
         }
