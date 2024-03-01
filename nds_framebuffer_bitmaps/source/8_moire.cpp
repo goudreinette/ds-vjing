@@ -5,10 +5,6 @@
 #include "../../effolkronium/random.hpp"
 
 
-
-#define A
-
-
 class MoireScene : public Scene
 {
     int t = 0;
