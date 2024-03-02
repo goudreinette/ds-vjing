@@ -152,8 +152,8 @@ void setupGraphics() {
     NF_Set2D(1, 0);
 
     // BG colors
-    setBackdropColor(black); // Set the backdrop color to pico white
-    setBackdropColorSub(black); // Set the backdrop color to pico white
+    setBackdropColor(picoWhite); // Set the backdrop color to pico white
+    setBackdropColorSub(picoWhite); // Set the backdrop color to pico white
 
     // Initialize tiled backgrounds system
     NF_InitTiledBgBuffers();    // Initialize storage buffers
