@@ -5,7 +5,8 @@
 
 
 // Background layers
-const int tilesTopLayer = 3;
+const int tilesTopLayer = 1;
+const int algoraveTextLayer = 3;
 const int tilesBottomLayer = 0;
 
 // Background scroll variables
@@ -54,7 +55,7 @@ void setupPointerSprite() {
 
 void setupGraphics() {
     // Prepare a NitroFS initialization screen
-    NF_Set2D(0, 0);
+    NF_Set2D(0, 2);
     NF_Set2D(1, 0);
     consoleDemoInit();
     printf("\n NitroFS init. Please wait.\n\n");
@@ -75,7 +76,8 @@ void setupGraphics() {
 
     // Initialize tiled backgrounds system
     NF_InitTiledBgBuffers();    // Initialize storage buffers
-    NF_InitTiledBgSys(0);       // Top screen
+    NF_InitAffineBgSys(0);       // Top screen
+    // NF_InitTiledBgSys(0);       // Top screen
     NF_InitTiledBgSys(1);       // Bottom screen
 
     // Initialize sprite system
@@ -87,8 +89,13 @@ void setupGraphics() {
     NF_LoadTiledBg("bg/tiles", "tilesTop", 512, 512);
     NF_LoadTiledBg("bg/tiles", "tilesBottom", 512, 512);
 
+    NF_LoadAffineBg("bg/algorave-text", "algoraveText", 256, 256);
+    NF_LoadAffineBg("bg/algorave-text-empty", "algoraveTextEmpty", 256, 256);
+
     // Create top screen background
     NF_CreateTiledBg(0, tilesTopLayer, "tilesTop");
+    // NF_CreateAffineBg(0, algoraveTextLayer, "algoraveText", 0);
+    NF_CreateAffineBg(0, algoraveTextLayer, "algoraveTextEmpty", 0);
 
     // Create bottom screen backgrounds
     NF_CreateTiledBg(1, tilesBottomLayer, "tilesBottom");
@@ -185,9 +192,11 @@ void fillChanceEmpty(int chance = 50) {
             empty = false;
         }
 
-        NF_SetTileOfMap(0, tilesTopLayer, rand() % 32, rand() % 32, empty ? 0 : rand() % 16);
-        NF_SetTileOfMap(1, tilesBottomLayer, rand() % 32, rand() % 32, empty ? 0 : rand() % 24 + 32); //25
+        // NF_SetTileOfMap(0, tilesTopLayer, rand() % 32, rand() % 32, empty ? 0 : rand() % 16);
+        // NF_SetTileOfMap(1, tilesBottomLayer, rand() % 32, rand() % 32, empty ? 0 : rand() % 24 + 32); //25
         // NF_SetTileOfMap(1, tilesBottomLayer, rand() % 64, rand() % 32, rand() % 64); //25
+        NF_SetTileOfMap(1, tilesBottomLayer, rand() % 32, rand() % 32, empty ? 0 : rand() % 16);
+        NF_SetTileOfMap(0, tilesTopLayer, rand() % 32, rand() % 32, empty ? 0 : rand() % 6 + 36); //25
     }
 }
 
@@ -195,12 +204,18 @@ void printCursorPositionAndTileUnderCursor() {
     // Print pointer position
     char mytext[60];
     sprintf(mytext,"x:%d  y:%d ", x, y);
-    NF_WriteText(0, 2, 1, 1, mytext);
+    NF_WriteText(0, 2, 2, 2, mytext);
 
     // Print the color of the tile under the pointer
     int tilenum = NF_GetTileOfMap(1, 0, x / 8, y / 8);
     sprintf(mytext," %d   ", tilenum);
-    NF_WriteText(0, 2, 1, 3, mytext);
+    NF_WriteText(0, 2, 1, 4, mytext);
+}
+
+void printParticipants() {
+    char mytext[60];
+    // sprintf(mytext,"TEST TEST");
+    NF_WriteText(0, 2, 4, 4, mytext);
 }
 
 
@@ -209,6 +224,10 @@ void updateBothVramMaps() {
     NF_UpdateVramMap(1, tilesBottomLayer);
 }
 
+void scaleAlgorave() {
+    NF_AffineBgTransform(0, algoraveTextLayer, 512, 512, 0, 0);
+    NF_AffineBgMove(0, algoraveTextLayer, 100, 0, 0);
+}
 
 
 /*
@@ -230,6 +249,14 @@ int main(int argc, char **argv)
         // Read keys
         scanKeys();
         u16 keys = keysHeld();
+        u16 down = keysDown();
+
+
+        // 
+        if (down & KEY_DOWN) {
+            NF_CreateAffineBg(0, algoraveTextLayer, "algoraveText", 0);
+        }
+
 
         // Read touch screen
         touchPosition touch;
@@ -237,6 +264,11 @@ int main(int argc, char **argv)
 
         int emptyChance = touch.py;
         fillChanceEmpty(emptyChance);
+
+        // scaleAlgorave();
+        // NF_AffineBgMove(0, algoraveTextLayer, 100, 0, 0);
+
+
 
 
         // Change the tile under the pointer if the user presses a button
@@ -246,6 +278,7 @@ int main(int argc, char **argv)
 
 
         printCursorPositionAndTileUnderCursor();
+        printParticipants();
 
         // Update text layers
         NF_UpdateTextLayers();
