@@ -28,6 +28,7 @@ s16 y = 96;
 
 // Colors 
 const int picoWhite = ARGB16(1, 31, 30, 29);
+const int black = ARGB16(1, 0, 0, 0);
 
 // Time
 int t = 0;
@@ -151,8 +152,8 @@ void setupGraphics() {
     NF_Set2D(1, 0);
 
     // BG colors
-    setBackdropColor(picoWhite); // Set the backdrop color to pico white
-    setBackdropColorSub(picoWhite); // Set the backdrop color to pico white
+    setBackdropColor(black); // Set the backdrop color to pico white
+    setBackdropColorSub(black); // Set the backdrop color to pico white
 
     // Initialize tiled backgrounds system
     NF_InitTiledBgBuffers();    // Initialize storage buffers
@@ -320,7 +321,7 @@ void drawSimplexNoise(float scale = 1) {
 }
 
 void updateParallelProblems(bool controlledByTouch = false) {
-    if (controlledByTouch) {
+    if (controlledByTouch && behaviours.parallelProblemsScaleControlledByTouch) {
         parallelProblemsTransform.scale = lerp(touch.py, parallelProblemsTransform.scale, 4);
     } else {
         parallelProblemsTransform.scale = lerp(parallelProblemsTransform.scale, behaviours.parallelProblemsVisible ? 64 : 0, 32);
@@ -372,9 +373,9 @@ int main(int argc, char **argv)
         if (down & KEY_DOWN || piano & PIANO_C) {
             behaviours.parallelProblemsVisible = !behaviours.parallelProblemsVisible;
             if (behaviours.parallelProblemsVisible) {
-                NF_CreateTiledBg(0, algoraveTextLayer, "algoraveText");
+                // NF_CreateTiledBg(0, algoraveTextLayer, "algoraveText");
             } else {
-                NF_CreateTiledBg(0, algoraveTextLayer, "algoraveTextEmpty");
+                // NF_CreateTiledBg(0, algoraveTextLayer, "algoraveTextEmpty");
             }
         }
 
