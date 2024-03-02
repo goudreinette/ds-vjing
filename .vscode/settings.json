@@ -4,7 +4,8 @@
         "vector": "cpp",
         "filesystem": "cpp",
         "cmath": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "cstddef": "cpp"
     },
     "terminal.integrated.defaultProfile.windows": "MSYS2",
     "terminal.integrated.profiles.windows": {

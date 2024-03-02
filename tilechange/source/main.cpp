@@ -3,6 +3,13 @@
 #include <filesystem.h>
 #include <nf_lib.h>
 
+#include "./simplex/SimplexNoise.cpp"
+
+
+// Deps
+SimplexNoise noise;
+
+
 
 // Background layers
 const int tilesTopLayer = 1;
@@ -21,6 +28,28 @@ int t = 0;
 
 // Global state 
 int currentTile = 0;
+
+
+// Behaviours
+struct {
+    bool parallelProblemsVisible = false;
+    bool parallelProblemsSpinning = false;
+
+    bool fillRateControlledByTouch = false;
+    bool drawingWithTouch = false;
+    bool movingMapWithTouch = false;
+
+    bool simplexNoise = true;
+} behaviours;
+
+
+// Tile indexes
+struct {
+    int dither[2] = {64, 80};
+    
+} tileIndexes;
+
+
 
 
 /*
@@ -229,6 +258,17 @@ void scaleAlgorave() {
     NF_AffineBgMove(0, algoraveTextLayer, 100, 0, 0);
 }
 
+void drawSimplexNoise() {
+    for (int i = 0; i < 32; i++) {
+        for (int j = 0; j < 32; j++) {
+            float value = SimplexNoise::noise(0.01 * i, 0.01 * j, (float) t * 0.001);
+            int tile = abs(value) * 8;
+
+            NF_SetTileOfMap(1, tilesBottomLayer, i, j, tile);
+        }
+    }
+}
+
 
 /*
 |--------------------------------------------------------------------------
@@ -246,24 +286,38 @@ int main(int argc, char **argv)
     while (true) {
         t++;
 
-        // Read keys
+        // Read keys, touch and piano
         scanKeys();
         u16 keys = keysHeld();
         u16 down = keysDown();
 
+        touchPosition touch;
+        touchRead(&touch);
 
-        // 
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Excecute behaviours
+        */
         if (down & KEY_DOWN) {
             NF_CreateAffineBg(0, algoraveTextLayer, "algoraveText", 0);
         }
 
+        if (behaviours.movingMapWithTouch) {
+            updateMapScroll(keys);
+        }
 
-        // Read touch screen
-        touchPosition touch;
-        touchRead(&touch);
+        if (behaviours.simplexNoise) {
+            drawSimplexNoise();
+        }
 
-        int emptyChance = touch.py;
-        fillChanceEmpty(emptyChance);
+
+
+
+        // int emptyChance = touch.py;
+        // fillChanceEmpty(emptyChance);
 
         // scaleAlgorave();
         // NF_AffineBgMove(0, algoraveTextLayer, 100, 0, 0);
@@ -274,11 +328,6 @@ int main(int argc, char **argv)
         // Change the tile under the pointer if the user presses a button
         // randomizeSomeTiles(25);
         updateBothVramMaps();
-
-
-
-        printCursorPositionAndTileUnderCursor();
-        printParticipants();
 
         // Update text layers
         NF_UpdateTextLayers();
