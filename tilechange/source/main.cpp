@@ -4,6 +4,7 @@
 #include <nf_lib.h>
 
 #include "./simplex/SimplexNoise.cpp"
+#include <cmath>
 
 
 // Deps
@@ -149,7 +150,7 @@ void setupGraphics() {
 
     // Initialize sprite system
     NF_InitSpriteBuffers();     // Initialize storage buffers
-    NF_Init3dSpriteSys();       // Initialize 3D sprite system
+    // NF_Init3dSpriteSys();       // Initialize 3D sprite system
     NF_InitSpriteSys(0);        // Top screen
     NF_InitSpriteSys(1);        // Bottom screen
 
@@ -392,7 +393,8 @@ int main(int argc, char **argv)
         
 
         // scaleAlgorave();
-        // NF_AffineBgMove(0, algoraveTextLayer, 100, 0, 0);
+        
+        // NF_AffineBgMove(0, algoraveTextLayer, sin(t / 1000.0) * 80.0, 0, 0);
 
 
 
@@ -404,13 +406,13 @@ int main(int argc, char **argv)
         // Update text layers
         NF_UpdateTextLayers();
 
-        // // Update OAM array
+        // Update OAM array
         NF_SpriteOamSet(1);
 
         // Wait for the screen refresh
         swiWaitForVBlank();
 
-        // // Update OAM
+        // Update OAM
         oamUpdate(&oamSub);
     }
 }
