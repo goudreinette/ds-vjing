@@ -10,11 +10,16 @@
 SimplexNoise noise;
 
 
-
 // Background layers
 const int tilesTopLayer = 1;
 const int algoraveTextLayer = 3;
 const int tilesBottomLayer = 0;
+
+// Sprites
+struct {
+    int cursor = 0;
+    int parallelProblems = 1;
+} spriteIndexes;
 
 // Background scroll variables
 s16 x = 128;
@@ -28,6 +33,9 @@ int t = 0;
 
 // Global state 
 int currentTile = 0;
+int tileOffset = 0;
+
+float perlinScale = 1;
 
 
 // Behaviours
@@ -40,6 +48,7 @@ struct {
     bool movingMapWithTouch = false;
 
     bool simplexNoise = true;
+    bool fillRandomTiles = false;
 } behaviours;
 
 
@@ -73,12 +82,41 @@ void setupPointerSprite() {
     NF_LoadSpritePal("sprite/pointer", 0);
 
     // Transfer the required sprites to VRAM
-    NF_VramSpriteGfx(1, 0, 0, true);
-    NF_VramSpritePal(1, 0, 0);
+    NF_VramSpriteGfx(1, spriteIndexes.cursor, spriteIndexes.cursor, true);
+    NF_VramSpritePal(1, spriteIndexes.cursor, spriteIndexes.cursor);
 
     // Create sprite and set its priority layer
-    NF_CreateSprite(1, 0, 0, 0, 124, 92);
+    NF_CreateSprite(1, spriteIndexes.cursor, spriteIndexes.cursor, spriteIndexes.cursor, 124, 92);
     NF_SpriteLayer(1, 0, 2);
+}
+
+
+void setupParallelProblemsSprite() {
+    NF_LoadSpriteGfx("sprite/pp", 0, 256, 128);
+    NF_LoadSpritePal("sprite/pp", 0);
+
+    NF_Vram3dSpriteGfx(0, 0, true);
+    NF_Vram3dSpritePal(0, 0);
+}
+
+void setupAlgoraveTextBg() {
+    NF_LoadAffineBg("bg/pp", "algoraveText", 256, 256);
+    NF_LoadAffineBg("bg/algorave-text-empty", "algoraveTextEmpty", 256, 256);
+
+    NF_CreateAffineBg(0, algoraveTextLayer, "algoraveTextEmpty", 0);
+}
+
+void setupTilesBg() {
+    // Load background files from NitroFS
+    NF_LoadTiledBg("bg/tiles", "tilesTop", 512, 512);
+    NF_LoadTiledBg("bg/tiles", "tilesBottom", 512, 512);
+
+    // Create top screen background
+    NF_CreateTiledBg(0, tilesTopLayer, "tilesTop");
+
+
+    // Create bottom screen backgrounds
+    NF_CreateTiledBg(1, tilesBottomLayer, "tilesBottom");
 }
 
 
@@ -111,26 +149,19 @@ void setupGraphics() {
 
     // Initialize sprite system
     NF_InitSpriteBuffers();     // Initialize storage buffers
+    NF_Init3dSpriteSys();       // Initialize 3D sprite system
     NF_InitSpriteSys(0);        // Top screen
     NF_InitSpriteSys(1);        // Bottom screen
 
-    // Load background files from NitroFS
-    NF_LoadTiledBg("bg/tiles", "tilesTop", 512, 512);
-    NF_LoadTiledBg("bg/tiles", "tilesBottom", 512, 512);
+    
 
-    NF_LoadAffineBg("bg/algorave-text", "algoraveText", 256, 256);
-    NF_LoadAffineBg("bg/algorave-text-empty", "algoraveTextEmpty", 256, 256);
 
-    // Create top screen background
-    NF_CreateTiledBg(0, tilesTopLayer, "tilesTop");
-    // NF_CreateAffineBg(0, algoraveTextLayer, "algoraveText", 0);
-    NF_CreateAffineBg(0, algoraveTextLayer, "algoraveTextEmpty", 0);
+    setupAlgoraveTextBg();
+    setupTilesBg();
 
-    // Create bottom screen backgrounds
-    NF_CreateTiledBg(1, tilesBottomLayer, "tilesBottom");
-
-    setupPointerSprite();
-    setupText();
+    // setupPointerSprite();
+    // setupText();
+    
 }
 
 /*
@@ -258,13 +289,20 @@ void scaleAlgorave() {
     NF_AffineBgMove(0, algoraveTextLayer, 100, 0, 0);
 }
 
-void drawSimplexNoise() {
+void drawSimplexNoise(float scale = 1) {
     for (int i = 0; i < 32; i++) {
         for (int j = 0; j < 32; j++) {
-            float value = SimplexNoise::noise(0.01 * i, 0.01 * j, (float) t * 0.001);
-            int tile = abs(value) * 8;
+            if (rand() % 100 > 75) {
+                float t_ = t * 0.01;
+                float value0 = SimplexNoise::noise(0.01 * i * scale, 0.01 * j * scale, t_);
+                float value1 = SimplexNoise::noise(0.01 * i * scale, 0.01 * (j + 24) * scale, t_);
 
-            NF_SetTileOfMap(1, tilesBottomLayer, i, j, tile);
+                int tile0 = abs(value0) * 8 + tileOffset;
+                int tile1 = abs(value1) * 8 + tileOffset;
+
+                NF_SetTileOfMap(0, tilesTopLayer, i, j, tile0);
+                NF_SetTileOfMap(1, tilesBottomLayer, i, j, tile1);
+            }
         }
     }
 }
@@ -294,6 +332,34 @@ int main(int argc, char **argv)
         touchPosition touch;
         touchRead(&touch);
 
+        pianoScanKeys();
+        u16 piano = pianoKeysDown();
+
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Toggle behaviours
+        */
+        if (down & KEY_DOWN || piano & PIANO_C) {
+            behaviours.parallelProblemsVisible = !behaviours.parallelProblemsVisible;
+            if (behaviours.parallelProblemsVisible) {
+                NF_CreateTiledBg(0, algoraveTextLayer, "algoraveText");
+            } else {
+                NF_CreateTiledBg(0, algoraveTextLayer, "algoraveTextEmpty");
+            }
+        }
+
+        if (down & KEY_A || piano & PIANO_D) {
+            behaviours.simplexNoise = !behaviours.simplexNoise;
+        }
+
+        if (down & KEY_B || piano & PIANO_E) {
+            behaviours.fillRandomTiles = !behaviours.fillRandomTiles;
+        }
+
+        
 
 
 
@@ -301,23 +367,29 @@ int main(int argc, char **argv)
         |--------------------------------------------------------------------------
         | Excecute behaviours
         */
-        if (down & KEY_DOWN) {
-            NF_CreateAffineBg(0, algoraveTextLayer, "algoraveText", 0);
-        }
-
+        
         if (behaviours.movingMapWithTouch) {
             updateMapScroll(keys);
         }
 
         if (behaviours.simplexNoise) {
-            drawSimplexNoise();
+            // PERLIN OPTIONS
+            if (keys & KEY_LEFT) {
+                tileOffset = touch.px * 0.2;
+                perlinScale = touch.py * 0.02;
+            }
+            drawSimplexNoise(perlinScale);
+        }
+
+        if (behaviours.fillRandomTiles) {
+            int emptyChance = touch.py;
+            fillChanceEmpty(emptyChance);
         }
 
 
 
 
-        // int emptyChance = touch.py;
-        // fillChanceEmpty(emptyChance);
+        
 
         // scaleAlgorave();
         // NF_AffineBgMove(0, algoraveTextLayer, 100, 0, 0);
@@ -333,12 +405,12 @@ int main(int argc, char **argv)
         NF_UpdateTextLayers();
 
         // // Update OAM array
-        // NF_SpriteOamSet(1);
+        NF_SpriteOamSet(1);
 
         // Wait for the screen refresh
         swiWaitForVBlank();
 
         // // Update OAM
-        // oamUpdate(&oamSub);
+        oamUpdate(&oamSub);
     }
 }
