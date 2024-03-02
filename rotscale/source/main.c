@@ -16,6 +16,15 @@
 #define MAXSPRITES 1
 
 
+bool ppVisible = true;
+
+
+
+// lerp function
+int lerp(int a, int b, int t) {
+    return a + ((b - a) * t >> 8);
+}
+
 
 int main(int argc, char **argv)
 {
@@ -107,6 +116,15 @@ int main(int argc, char **argv)
         scanKeys();
         u16 press = keysDown();
         u16 held = keysHeld();
+
+
+
+        if (press & KEY_A) {
+            ppVisible = !ppVisible;
+        }
+
+        scale[id] = lerp(scale[id], ppVisible ? 64 : 0, 16);
+
 
         // Rotate Z axis of the selcted sprite
         if (held & KEY_RIGHT)

@@ -135,7 +135,7 @@ void setupGraphics() {
     NF_SetRootFolder("NITROFS");
 
     // Initialize 2D engine in both screens and use mode 0
-    NF_Set2D(0, 0);
+    NF_Set3D(0, 0);
     NF_Set2D(1, 0);
 
     // BG colors
