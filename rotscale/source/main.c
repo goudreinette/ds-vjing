@@ -53,12 +53,8 @@ int main(int argc, char **argv)
     NF_LoadSpritePal("sprite/pp", 2);
 
     // Transfer the required sprites to VRAM
-
     NF_Vram3dSpriteGfx(2, 2, true);
     NF_Vram3dSpritePal(2, 2);
-
-    // Create background
-    // NF_CreateTiledBg(0, 3, "bg3");
 
     // Variables
     s16 x[MAXSPRITES];
@@ -74,24 +70,6 @@ int main(int argc, char **argv)
     for (int n = 0; n < MAXSPRITES; n++)
     {
         int r;
-
-        if ((n % 2) == 0)
-            r = 1;
-        else
-            r = 0;
-
-        x[n] = (rand() % 128) + 1;
-        y[n] = (rand() % 112) + 1;
-        if ((rand() % 100) > 50)
-            ix[n] = 1;
-        else
-            ix[n] = -1;
-
-        if ((rand() % 100) > 50)
-            iy[n] = 1;
-        else
-            iy[n] = -1;
-
         rx[n] = 0;
         ry[n] = 0;
         rz[n] = 0;
@@ -115,77 +93,15 @@ int main(int argc, char **argv)
         // Read keys
         scanKeys();
         u16 press = keysDown();
-        u16 held = keysHeld();
-
-
 
         if (press & KEY_A) {
             ppVisible = !ppVisible;
         }
-
         scale[id] = lerp(scale[id], ppVisible ? 64 : 0, 16);
-
-
-        // Rotate Z axis of the selcted sprite
-        if (held & KEY_RIGHT)
-        {
-            rz[id] += 2;
-            if (rz[id] > 512)
-                rz[id] -= 512;
-        }
-        if (held & KEY_LEFT)
-        {
-            rz[id] -= 2;
-            if (rz[id] < 0)
-                rz[id] += 512;
-        }
-
-        // Rotate Y axis of the selcted sprite
-        if (held & KEY_DOWN)
-        {
-            ry[id] += 2;
-            if (ry[id] > 512)
-                ry[id] -= 512;
-        }
 
         ry[id] += 3;
         if (ry[id] > 512)
             ry[id] -= 512;
-
-        if (held & KEY_UP)
-        {
-            ry[id] -= 2;
-            if (ry[id] < 0)
-                ry[id] += 512;
-        }
-
-        // Rotate X axis of the selcted sprite
-        if (held & KEY_X)
-        {
-            rx[id] += 2;
-            if (rx[id] > 512)
-                rx[id] -= 512;
-        }
-        if (held & KEY_Y)
-        {
-            rx[id] -= 2;
-            if (rx[id] < 0)
-                rx[id] += 512;
-        }
-
-        // Scale sprite
-        if (held & KEY_R)
-        {
-            scale[id] += 2;
-            if (scale[id] > 512)
-                scale[id] = 512;
-        }
-        if (held & KEY_L)
-        {
-            scale[id] -= 2;
-            if (scale[id] < 0)
-                scale[id] = 0;
-        }
 
         // Apply rotation and scale
         NF_Rotate3dSprite(id, rx[id], ry[id], rz[id]);

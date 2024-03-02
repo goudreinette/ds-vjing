@@ -38,11 +38,17 @@ int tileOffset = 0;
 
 float perlinScale = 1;
 
+struct {
+    int scale = 64;
+    int rotation = 0;
+} parallelProblemsTransform;
+
 
 // Behaviours
 struct {
-    bool parallelProblemsVisible = false;
+    bool parallelProblemsVisible = true;
     bool parallelProblemsSpinning = false;
+    bool parallelProblemsScaleControlledByTouch = false;
 
     bool fillRateControlledByTouch = false;
     bool drawingWithTouch = false;
@@ -60,7 +66,17 @@ struct {
 } tileIndexes;
 
 
+touchPosition touch;
 
+
+/*
+|--------------------------------------------------------------------------
+| Utils
+|--------------------------------------------------------------------------
+*/
+int lerp(int a, int b, int t) {
+    return a + ((b - a) * t >> 8);
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -93,18 +109,21 @@ void setupPointerSprite() {
 
 
 void setupParallelProblemsSprite() {
-    NF_LoadSpriteGfx("sprite/pp", 0, 256, 128);
-    NF_LoadSpritePal("sprite/pp", 0);
+    NF_LoadSpriteGfx("sprite/pp", spriteIndexes.parallelProblems, 256, 128);
+    NF_LoadSpritePal("sprite/pp", spriteIndexes.parallelProblems);
 
-    NF_Vram3dSpriteGfx(0, 0, true);
-    NF_Vram3dSpritePal(0, 0);
+    NF_Vram3dSpriteGfx(spriteIndexes.parallelProblems, spriteIndexes.parallelProblems, true);
+    NF_Vram3dSpritePal(spriteIndexes.parallelProblems, spriteIndexes.parallelProblems);
+
+    NF_Create3dSprite(spriteIndexes.parallelProblems, spriteIndexes.parallelProblems, spriteIndexes.parallelProblems, 0, 32);
+    NF_Sort3dSprites();
 }
 
 void setupAlgoraveTextBg() {
-    NF_LoadAffineBg("bg/pp", "algoraveText", 256, 256);
-    NF_LoadAffineBg("bg/algorave-text-empty", "algoraveTextEmpty", 256, 256);
+    NF_LoadTiledBg("bg/pp", "algoraveText", 256, 256);
+    NF_LoadTiledBg("bg/algorave-text-empty", "algoraveTextEmpty", 256, 256);
 
-    NF_CreateAffineBg(0, algoraveTextLayer, "algoraveTextEmpty", 0);
+    NF_CreateTiledBg(0, algoraveTextLayer, "algoraveTextEmpty");
 }
 
 void setupTilesBg() {
@@ -121,15 +140,8 @@ void setupTilesBg() {
 }
 
 
-void setupGraphics() {
-    // Prepare a NitroFS initialization screen
-    NF_Set2D(0, 2);
-    NF_Set2D(1, 0);
-    consoleDemoInit();
-    printf("\n NitroFS init. Please wait.\n\n");
-    printf(" Iniciando NitroFS,\n por favor, espere.\n\n");
-    swiWaitForVBlank();
 
+void setupGraphics() {
     // Initialize NitroFS and set it as the root folder of the filesystem
     nitroFSInit(NULL);
     NF_SetRootFolder("NITROFS");
@@ -144,20 +156,19 @@ void setupGraphics() {
 
     // Initialize tiled backgrounds system
     NF_InitTiledBgBuffers();    // Initialize storage buffers
-    NF_InitAffineBgSys(0);       // Top screen
-    // NF_InitTiledBgSys(0);       // Top screen
+    NF_InitTiledBgSys(0);       // Top screen
     NF_InitTiledBgSys(1);       // Bottom screen
 
     // Initialize sprite system
     NF_InitSpriteBuffers();     // Initialize storage buffers
-    // NF_Init3dSpriteSys();       // Initialize 3D sprite system
-    NF_InitSpriteSys(0);        // Top screen
-    NF_InitSpriteSys(1);        // Bottom screen
+    NF_Init3dSpriteSys();
+    // NF_InitSpriteSys(0);        // Top screen
+    // NF_InitSpriteSys(1);        // Bottom screen
 
     
 
-
-    setupAlgoraveTextBg();
+    setupParallelProblemsSprite();
+    // setupAlgoraveTextBg();
     setupTilesBg();
 
     // setupPointerSprite();
@@ -293,7 +304,7 @@ void scaleAlgorave() {
 void drawSimplexNoise(float scale = 1) {
     for (int i = 0; i < 32; i++) {
         for (int j = 0; j < 32; j++) {
-            if (rand() % 100 > 75) {
+            if (rand() % 100 > 85) {
                 float t_ = t * 0.01;
                 float value0 = SimplexNoise::noise(0.01 * i * scale, 0.01 * j * scale, t_);
                 float value1 = SimplexNoise::noise(0.01 * i * scale, 0.01 * (j + 24) * scale, t_);
@@ -308,6 +319,27 @@ void drawSimplexNoise(float scale = 1) {
     }
 }
 
+void updateParallelProblems(bool controlledByTouch = false) {
+    if (controlledByTouch) {
+        parallelProblemsTransform.scale = lerp(touch.py, parallelProblemsTransform.scale, 4);
+    } else {
+        parallelProblemsTransform.scale = lerp(parallelProblemsTransform.scale, behaviours.parallelProblemsVisible ? 64 : 0, 32);
+    }
+
+    if (behaviours.parallelProblemsSpinning) {
+        parallelProblemsTransform.rotation += 10;
+        if (parallelProblemsTransform.rotation > 512)
+            parallelProblemsTransform.rotation -= 512;
+    } else {
+        parallelProblemsTransform.rotation = lerp(0, parallelProblemsTransform.rotation, 128);
+    }
+    
+
+    // Apply rotation and scale
+    NF_Rotate3dSprite(spriteIndexes.parallelProblems, 0, parallelProblemsTransform.rotation, 0);
+    NF_Scale3dSprite(spriteIndexes.parallelProblems, parallelProblemsTransform.scale, parallelProblemsTransform.scale);
+}
+
 
 /*
 |--------------------------------------------------------------------------
@@ -317,10 +349,6 @@ void drawSimplexNoise(float scale = 1) {
 int main(int argc, char **argv)
 {
     setupGraphics();
-    // fillRandomTiles();
-    // randomizeSo/meTiles();
-    
-    // updateBothVramMaps();
 
     while (true) {
         t++;
@@ -330,13 +358,11 @@ int main(int argc, char **argv)
         u16 keys = keysHeld();
         u16 down = keysDown();
 
-        touchPosition touch;
+        
         touchRead(&touch);
 
         pianoScanKeys();
         u16 piano = pianoKeysDown();
-
-
 
 
         /*
@@ -358,6 +384,14 @@ int main(int argc, char **argv)
 
         if (down & KEY_B || piano & PIANO_E) {
             behaviours.fillRandomTiles = !behaviours.fillRandomTiles;
+        }
+
+        if (down & KEY_Y || piano & PIANO_F) {
+            behaviours.parallelProblemsVisible = !behaviours.parallelProblemsVisible;
+        }
+
+        if (down & KEY_X || piano & PIANO_G) {
+            behaviours.parallelProblemsSpinning = !behaviours.parallelProblemsSpinning;
         }
 
         
@@ -388,15 +422,20 @@ int main(int argc, char **argv)
         }
 
 
+        updateParallelProblems(keys & KEY_TOUCH);
+
 
 
         
-
-        // scaleAlgorave();
         
         // NF_AffineBgMove(0, algoraveTextLayer, sin(t / 1000.0) * 80.0, 0, 0);
+        
+        
+        // Draw all 3D sprites
+        NF_Draw3dSprites();
 
-
+        // Tell the GPU to draw the scene and wait until it's done
+        glFlush(0);
 
 
         // Change the tile under the pointer if the user presses a button

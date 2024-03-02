@@ -3,6 +3,7 @@
 
 # Sprites
 grit pointer.png -ftb -fh! -gTFF00FF -gt -gB8 -m!
+grit pp.png -ftb -fh! -gTFF00FF -gb -gB8 -m!
 # grit pp.png -ftb -fh! -gT000000 -gt -gB8 -m!
 
 for file in *.bin; do
