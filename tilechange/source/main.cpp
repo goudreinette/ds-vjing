@@ -395,6 +395,10 @@ int main(int argc, char **argv)
             behaviours.parallelProblemsSpinning = !behaviours.parallelProblemsSpinning;
         }
 
+        if (down & KEY_L || piano & PIANO_A) {
+            behaviours.parallelProblemsScaleControlledByTouch = !behaviours.parallelProblemsScaleControlledByTouch;
+        }
+
         
 
 
@@ -437,7 +441,6 @@ int main(int argc, char **argv)
 
         // Tell the GPU to draw the scene and wait until it's done
         glFlush(0);
-
 
         // Change the tile under the pointer if the user presses a button
         // randomizeSomeTiles(25);
