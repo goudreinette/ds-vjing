@@ -12,9 +12,12 @@ SimplexNoise noise;
 
 
 // Background layers
-const int tilesTopLayer = 1;
-const int algoraveTextLayer = 3;
-const int tilesBottomLayer = 0;
+struct {
+    int tilesTop = 1;
+    int algoraveText = 3;
+    int tilesBottom = 0;
+} bgLayers;
+
 
 // Sprites
 struct {
@@ -124,7 +127,7 @@ void setupAlgoraveTextBg() {
     NF_LoadTiledBg("bg/pp", "algoraveText", 256, 256);
     NF_LoadTiledBg("bg/algorave-text-empty", "algoraveTextEmpty", 256, 256);
 
-    NF_CreateTiledBg(0, algoraveTextLayer, "algoraveTextEmpty");
+    NF_CreateTiledBg(0, bgLayers.algoraveText, "algoraveTextEmpty");
 }
 
 void setupTilesBg() {
@@ -133,11 +136,11 @@ void setupTilesBg() {
     NF_LoadTiledBg("bg/tiles", "tilesBottom", 512, 512);
 
     // Create top screen background
-    NF_CreateTiledBg(0, tilesTopLayer, "tilesTop");
+    NF_CreateTiledBg(0, bgLayers.tilesTop, "tilesTop");
 
 
     // Create bottom screen backgrounds
-    NF_CreateTiledBg(1, tilesBottomLayer, "tilesBottom");
+    NF_CreateTiledBg(1, bgLayers.tilesBottom, "tilesBottom");
 }
 
 
@@ -239,19 +242,19 @@ void updateMapScroll(int keys) {
 void fillRandomTiles() {
     for (int i = 0; i < 32; i++) {
         for (int j = 0; j < 32; j++) {
-            NF_SetTileOfMap(0, tilesTopLayer, i, j, rand() % 16);
-            NF_SetTileOfMap(1, tilesBottomLayer, i, j, rand() % 16 + 25); //25
-            // NF_SetTileOfMap(0, tilesTopLayer, i, j, rand() % 64);
-            // NF_SetTileOfMap(1, tilesBottomLayer, i, j, rand() % 64);
+            NF_SetTileOfMap(0, bgLayers.tilesTop, i, j, rand() % 16);
+            NF_SetTileOfMap(1, bgLayers.tilesBottom, i, j, rand() % 16 + 25); //25
+            // NF_SetTileOfMap(0, bgLayers.tilesTop, i, j, rand() % 64);
+            // NF_SetTileOfMap(1, bgLayers.tilesBottom, i, j, rand() % 64);
         }
     }
 }
 
 void randomizeSomeTiles(int amount = 128) {
     for (int i = 0; i < amount; i++) {
-        NF_SetTileOfMap(0, tilesTopLayer, rand() % 32, rand() % 32, rand() % 16);
-        NF_SetTileOfMap(1, tilesBottomLayer, rand() % 32, rand() % 32, rand() % 24 + 32); //25
-        // NF_SetTileOfMap(1, tilesBottomLayer, rand() % 64, rand() % 32, rand() % 64); //25
+        NF_SetTileOfMap(0, bgLayers.tilesTop, rand() % 32, rand() % 32, rand() % 16);
+        NF_SetTileOfMap(1, bgLayers.tilesBottom, rand() % 32, rand() % 32, rand() % 24 + 32); //25
+        // NF_SetTileOfMap(1, bgLayers.tilesBottom, rand() % 64, rand() % 32, rand() % 64); //25
     }
 }
 
@@ -265,11 +268,11 @@ void fillChanceEmpty(int chance = 50) {
             empty = false;
         }
 
-        // NF_SetTileOfMap(0, tilesTopLayer, rand() % 32, rand() % 32, empty ? 0 : rand() % 16);
-        // NF_SetTileOfMap(1, tilesBottomLayer, rand() % 32, rand() % 32, empty ? 0 : rand() % 24 + 32); //25
-        // NF_SetTileOfMap(1, tilesBottomLayer, rand() % 64, rand() % 32, rand() % 64); //25
-        NF_SetTileOfMap(1, tilesBottomLayer, rand() % 32, rand() % 32, empty ? 0 : rand() % 16);
-        NF_SetTileOfMap(0, tilesTopLayer, rand() % 32, rand() % 32, empty ? 0 : rand() % 6 + 36); //25
+        // NF_SetTileOfMap(0, bgLayers.tilesTop, rand() % 32, rand() % 32, empty ? 0 : rand() % 16);
+        // NF_SetTileOfMap(1, bgLayers.tilesBottom, rand() % 32, rand() % 32, empty ? 0 : rand() % 24 + 32); //25
+        // NF_SetTileOfMap(1, bgLayers.tilesBottom, rand() % 64, rand() % 32, rand() % 64); //25
+        NF_SetTileOfMap(1, bgLayers.tilesBottom, rand() % 32, rand() % 32, empty ? 0 : rand() % 16);
+        NF_SetTileOfMap(0, bgLayers.tilesTop, rand() % 32, rand() % 32, empty ? 0 : rand() % 6 + 36); //25
     }
 }
 
@@ -293,13 +296,13 @@ void printParticipants() {
 
 
 void updateBothVramMaps() {
-    NF_UpdateVramMap(0, tilesTopLayer);
-    NF_UpdateVramMap(1, tilesBottomLayer);
+    NF_UpdateVramMap(0, bgLayers.tilesTop);
+    NF_UpdateVramMap(1, bgLayers.tilesBottom);
 }
 
 void scaleAlgorave() {
-    NF_AffineBgTransform(0, algoraveTextLayer, 512, 512, 0, 0);
-    NF_AffineBgMove(0, algoraveTextLayer, 100, 0, 0);
+    NF_AffineBgTransform(0, bgLayers.algoraveText, 512, 512, 0, 0);
+    NF_AffineBgMove(0, bgLayers.algoraveText, 100, 0, 0);
 }
 
 void drawSimplexNoise(float scale = 1) {
@@ -313,8 +316,8 @@ void drawSimplexNoise(float scale = 1) {
                 int tile0 = abs(value0) * 8 + tileOffset;
                 int tile1 = abs(value1) * 8 + tileOffset;
 
-                NF_SetTileOfMap(0, tilesTopLayer, i, j, tile0);
-                NF_SetTileOfMap(1, tilesBottomLayer, i, j, tile1);
+                NF_SetTileOfMap(0, bgLayers.tilesTop, i, j, tile0);
+                NF_SetTileOfMap(1, bgLayers.tilesBottom, i, j, tile1);
             }
         }
     }
@@ -373,9 +376,9 @@ int main(int argc, char **argv)
         if (down & KEY_DOWN || piano & PIANO_C) {
             behaviours.parallelProblemsVisible = !behaviours.parallelProblemsVisible;
             if (behaviours.parallelProblemsVisible) {
-                // NF_CreateTiledBg(0, algoraveTextLayer, "algoraveText");
+                // NF_CreateTiledBg(0, bgLayers.algoraveText, "algoraveText");
             } else {
-                // NF_CreateTiledBg(0, algoraveTextLayer, "algoraveTextEmpty");
+                // NF_CreateTiledBg(0, bgLayers.algoraveText, "algoraveTextEmpty");
             }
         }
 
@@ -433,7 +436,7 @@ int main(int argc, char **argv)
 
         
         
-        // NF_AffineBgMove(0, algoraveTextLayer, sin(t / 1000.0) * 80.0, 0, 0);
+        // NF_AffineBgMove(0, bgLayers.algoraveText, sin(t / 1000.0) * 80.0, 0, 0);
         
         
         // Draw all 3D sprites
