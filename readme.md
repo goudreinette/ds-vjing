@@ -4,6 +4,11 @@
 
 cd assets && sh convert.sh && cd .. && make clean && make && open tilechange.nds
 
+# watch
+chokidar "source/**.cpp" -c "cd assets && sh convert.sh && cd .. && make clean && make && open tilechange.nds"
+
+chokidar "source/**.cpp" -c "make && open tilechange.nds"
+
 ```
 
 

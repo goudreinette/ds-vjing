@@ -36,6 +36,7 @@ const int black = ARGB16(1, 0, 0, 0);
 // Time
 int t = 0;
 
+
 // Global state 
 int currentTile = 0;
 int tileOffset = 0;
@@ -64,6 +65,7 @@ struct {
 
 
 // Tile indexes
+// 
 struct {
     int dither[2] = {64, 80};
     
@@ -138,7 +140,6 @@ void setupTilesBg() {
     // Create top screen background
     NF_CreateTiledBg(0, bgLayers.tilesTop, "tilesTop");
 
-
     // Create bottom screen backgrounds
     NF_CreateTiledBg(1, bgLayers.tilesBottom, "tilesBottom");
 }
@@ -162,14 +163,10 @@ void setupGraphics() {
     NF_InitTiledBgBuffers();    // Initialize storage buffers
     NF_InitTiledBgSys(0);       // Top screen
     NF_InitTiledBgSys(1);       // Bottom screen
+    NF_Init3dSpriteSys();
 
     // Initialize sprite system
     NF_InitSpriteBuffers();     // Initialize storage buffers
-    NF_Init3dSpriteSys();
-    // NF_InitSpriteSys(0);        // Top screen
-    // NF_InitSpriteSys(1);        // Bottom screen
-
-    
 
     setupParallelProblemsSprite();
     // setupAlgoraveTextBg();
