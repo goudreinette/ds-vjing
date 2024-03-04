@@ -96,6 +96,7 @@ void addParticle(float dx, float dy) {
 }
 
 
+
 void resetParticle(Particle &p) {
     p.x = SCREEN_WIDTH / 2;
     p.y = SCREEN_HEIGHT / 2;
@@ -113,6 +114,8 @@ void updateParticles() {
         p.x += p.dx;
         p.y += p.dy;
         p.life++;
+        
+        NF_SpriteFrame(0, p.spriteId, t / 100 % 2);
 
 
         if (p.life > p.maxLife || p.x < 0 || p.x > SCREEN_WIDTH || p.y < 0 || p.y > SCREEN_HEIGHT) {
