@@ -17,7 +17,7 @@
                 "ARM9"
             ],
             "cStandard": "c11",
-            "cppStandard": "c++17",
+            "cppStandard": "c++20",
             "compilerPath": "/opt/devkitpro/devkitARM/bin/arm-none-eabi-gcc",
             "configurationProvider": "ms-vscode.makefile-tools"
         },

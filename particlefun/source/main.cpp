@@ -3,6 +3,7 @@
 #include <filesystem.h>
 #include <nf_lib.h>
 #include <vector>
+#include <algorithm>
 
 // Colors
 enum Color {
@@ -26,6 +27,7 @@ typedef struct Particle {
     int maxLife;
 };
 
+int maxParticles = 100;
 std::vector<Particle> particles;
 
 enum SpriteIds {
@@ -93,6 +95,18 @@ void addParticle(float dx, float dy) {
     particles.push_back(p);
 }
 
+
+void resetParticle(Particle &p) {
+    p.x = SCREEN_WIDTH / 2;
+    p.y = SCREEN_HEIGHT / 2;
+    p.dx = ((rand() % 100) / 100.0 - 0.5) / 4.0;
+    p.dy = ((rand() % 100) / 100.0 - 0.5) / 4.0;
+    p.life = 0;
+    p.maxLife = 60000;
+    
+    NF_MoveSprite(0, p.spriteId, p.x, p.y);
+}
+
 void updateParticles() {
     for (int i = 0; i < particles.size(); i++) {
         Particle &p = particles[i];
@@ -102,13 +116,15 @@ void updateParticles() {
 
 
         if (p.life > p.maxLife || p.x < 0 || p.x > SCREEN_WIDTH || p.y < 0 || p.y > SCREEN_HEIGHT) {
-            particles.erase(particles.begin() + i);
+            resetParticle(p);
+            // NF_DeleteSprite(0, p.spriteId);
+            // particles.erase(particles.begin() + i);
         } else {
             NF_MoveSprite(0, i, p.x, p.y);
         }
     }
-
 }
+
 
 
 /*
@@ -118,10 +134,10 @@ void updateParticles() {
 */
 int main(int argc, char **argv)
 {
-
     setupGraphics();
+    consoleDemoInit();
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < maxParticles; i++) {
         float dx = ((rand() % 100) / 100.0 - 0.5) / 4.0;
         float dy = ((rand() % 100) / 100.0 - 0.5) / 4.0;
         addParticle(dx, dy);
@@ -138,6 +154,7 @@ int main(int argc, char **argv)
         touchRead(&touch);
 
         updateParticles();
+        printf("\x1b[0;0HParticles: %d", particles.size());
 
 
         NF_SpriteOamSet(0);
