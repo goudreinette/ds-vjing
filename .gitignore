@@ -1,0 +1,14 @@
+.DS_Store
+
+*.nds
+*.elf
+*.img
+*.map
+*.pal
+
+build/
+
+1-dream/
+2-spiders/
+3-path/
+sint/
