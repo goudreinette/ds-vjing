@@ -56,6 +56,10 @@ float lerp(float a, float b, float t) {
     return a + t * (b - a);
 }
 
+int nextSpriteId() {
+    return spriteId++ % 128;
+}
+
 
 
 
@@ -90,7 +94,6 @@ void setupGraphics() {
     nitroFSInit(NULL);
     NF_SetRootFolder("NITROFS");
 
-
     // Initialize 2D engine in both screens and use mode 0
     NF_Set3D(0, 0);
     NF_Set2D(1, 0);
@@ -98,7 +101,6 @@ void setupGraphics() {
     // BG colors
     setBackdropColor(PURPLE); // Set the backdrop color to pico white
     setBackdropColorSub(PURPLE); // Set the backdrop color to pico white
-
 
     // Setup particle sprite
     NF_InitSpriteBuffers();
@@ -111,7 +113,7 @@ void setupGraphics() {
 
 void addParticle(float dx, float dy) {
     Particle p;
-    p.spriteId = spriteId++;
+    p.spriteId = nextSpriteId();
     p.x = SCREEN_WIDTH / 2;
     p.y = SCREEN_HEIGHT / 2;
     p.dx = dx;
@@ -178,7 +180,7 @@ void updateParticles() {
 void createPlayer () {
     player.x = SCREEN_WIDTH / 2;
     player.y = SCREEN_HEIGHT / 2;
-    player.spriteId = spriteId++;
+    player.spriteId = nextSpriteId();
 
     NF_CreateSprite(1, player.spriteId, SPR_PLAYER, SPR_PLAYER, player.x, player.y);
 }

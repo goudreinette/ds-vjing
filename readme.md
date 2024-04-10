@@ -9,6 +9,8 @@ chokidar "source/**.cpp" -c "cd assets && sh convert.sh && cd .. && make clean &
 
 chokidar "source/**.cpp" -c "make && open tilechange.nds"
 
+chokidar "source/**.cpp" "assets/**.png" "assets/convert.sh" -c "cd assets && sh convert.sh && cd .. && make clean && make && open particlefun.nds"
+
 ```
 
 
@@ -16,5 +18,9 @@ chokidar "source/**.cpp" -c "make && open tilechange.nds"
 
 first rows, then columns
 
-
 25 = separate squares
+
+
+animations: in a column
+
+cmd-shift-x to export spritesheet
