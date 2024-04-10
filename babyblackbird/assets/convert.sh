@@ -42,3 +42,4 @@ for file in *.img; do
 done
 
 mv *.pal *.fnt ../nitrofiles/fnt
+
