@@ -5,7 +5,13 @@
         "filesystem": "cpp",
         "cmath": "cpp",
         "random": "cpp",
-        "cstddef": "cpp"
+        "cstddef": "cpp",
+        "bit": "cpp",
+        "*.tcc": "cpp",
+        "functional": "cpp",
+        "limits": "cpp",
+        "tuple": "cpp",
+        "variant": "cpp"
     },
     "terminal.integrated.defaultProfile.windows": "MSYS2",
     "terminal.integrated.profiles.windows": {

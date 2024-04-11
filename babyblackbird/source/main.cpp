@@ -14,7 +14,6 @@ SimplexNoise noise;
 // Background layers
 struct {
     int tilesTop = 1;
-    int algoraveText = 3;
     int tilesBottom = 0;
 } bgLayers;
 
@@ -22,7 +21,7 @@ struct {
 // Sprites
 struct {
     int cursor = 0;
-    int parallelProblems = 1;
+    int bby = 1;
 } spriteIndexes;
 
 // Background scroll variables
@@ -30,12 +29,12 @@ s16 x = 128;
 s16 y = 96;
 
 // Colors 
+const int darkBlue = ARGB16(1, 4, 5, 10);
 const int picoWhite = ARGB16(1, 31, 30, 29);
 const int black = ARGB16(1, 0, 0, 0);
 
 // Time
 int t = 0;
-
 
 
 // Global state 
@@ -47,14 +46,15 @@ float perlinScale = 1;
 struct {
     int scale = 64;
     int rotation = 0;
-} parallelProblemsTransform;
+} bbyTransform;
+
 
 
 // Behaviours
 struct {
-    bool parallelProblemsVisible = true;
-    bool parallelProblemsSpinning = false;
-    bool parallelProblemsScaleControlledByTouch = false;
+    bool bbyVisible = true;
+    bool bbySpinning = false;
+    bool bbyScaleControlledByTouch = false;
 
     bool fillRateControlledByTouch = false;
     bool drawingWithTouch = false;
@@ -66,10 +66,8 @@ struct {
 
 
 // Tile indexes
-// 
 struct {
     int dither[2] = {64, 80};
-    
 } tileIndexes;
 
 
@@ -92,7 +90,7 @@ int lerp(int a, int b, int t) {
 */
 void setupText() {
     // Initialize text system
-    NF_InitTextSys(0);          // Top screen
+    NF_InitTextSys(0); // Top screen
     // Load text font files from NitroFS
     NF_LoadTextFont("fnt/default", "normal", 256, 256, 0);
     // Create a text layer
@@ -100,38 +98,17 @@ void setupText() {
 }
 
 
-void setupPointerSprite() {
-    // Load sprite files from NitroFS
-    NF_LoadSpriteGfx("sprite/pointer", 0, 8, 8);
-    NF_LoadSpritePal("sprite/pointer", 0);
+void setupbbySprite() {
+    NF_LoadSpriteGfx("sprite/bby", spriteIndexes.bby, 256, 128);
+    NF_LoadSpritePal("sprite/bby", spriteIndexes.bby);
 
-    // Transfer the required sprites to VRAM
-    NF_VramSpriteGfx(1, spriteIndexes.cursor, spriteIndexes.cursor, true);
-    NF_VramSpritePal(1, spriteIndexes.cursor, spriteIndexes.cursor);
+    NF_Vram3dSpriteGfx(spriteIndexes.bby, spriteIndexes.bby, true);
+    NF_Vram3dSpritePal(spriteIndexes.bby, spriteIndexes.bby);
 
-    // Create sprite and set its priority layer
-    NF_CreateSprite(1, spriteIndexes.cursor, spriteIndexes.cursor, spriteIndexes.cursor, 124, 92);
-    NF_SpriteLayer(1, 0, 2);
-}
-
-
-void setupParallelProblemsSprite() {
-    NF_LoadSpriteGfx("sprite/pp", spriteIndexes.parallelProblems, 256, 128);
-    NF_LoadSpritePal("sprite/pp", spriteIndexes.parallelProblems);
-
-    NF_Vram3dSpriteGfx(spriteIndexes.parallelProblems, spriteIndexes.parallelProblems, true);
-    NF_Vram3dSpritePal(spriteIndexes.parallelProblems, spriteIndexes.parallelProblems);
-
-    NF_Create3dSprite(spriteIndexes.parallelProblems, spriteIndexes.parallelProblems, spriteIndexes.parallelProblems, 0, 32);
+    NF_Create3dSprite(spriteIndexes.bby, spriteIndexes.bby, spriteIndexes.bby, 0, 32);
     NF_Sort3dSprites();
 }
 
-void setupAlgoraveTextBg() {
-    NF_LoadTiledBg("bg/pp", "algoraveText", 256, 256);
-    NF_LoadTiledBg("bg/algorave-text-empty", "algoraveTextEmpty", 256, 256);
-
-    NF_CreateTiledBg(0, bgLayers.algoraveText, "algoraveTextEmpty");
-}
 
 void setupTilesBg() {
     // Load background files from NitroFS
@@ -157,8 +134,8 @@ void setupGraphics() {
     NF_Set2D(1, 0);
 
     // BG colors
-    setBackdropColor(picoWhite); // Set the backdrop color to pico white
-    setBackdropColorSub(picoWhite); // Set the backdrop color to pico white
+    setBackdropColor(darkBlue); // Set the backdrop color to pico white
+    setBackdropColorSub(darkBlue); // Set the backdrop color to pico white
 
     // Initialize tiled backgrounds system
     NF_InitTiledBgBuffers();    // Initialize storage buffers
@@ -169,13 +146,10 @@ void setupGraphics() {
     // Initialize sprite system
     NF_InitSpriteBuffers();     // Initialize storage buffers
 
-    setupParallelProblemsSprite();
+    setupbbySprite();
     // setupAlgoraveTextBg();
     setupTilesBg();
 
-    // setupPointerSprite();
-    // setupText();
-    
 }
 
 /*
@@ -183,67 +157,11 @@ void setupGraphics() {
 | Update
 |--------------------------------------------------------------------------
 */
-void updateMapScroll(int keys) {
-    if (keys & KEY_UP) {
-        if (t%10 == 0) {
-            currentTile--;
-        }
-        y--;
-    }
-    if (keys & KEY_DOWN) {
-        if (t%10 == 0) {
-            currentTile++;    
-        }
-        y++;    
-    }
-
-    if (keys & KEY_LEFT)
-        x--;
-    if (keys & KEY_RIGHT)
-        x++;
-
-    // Movement limits
-    if (x < 0)
-        x = 0;
-    if (x > 767)
-        x = 767;
-
-    if (y < 0)
-        y = 0;
-    if (y > 511)
-        y = 511;
-
-    // Calculate background scroll from the coordinates of the pointer
-    int bg_x = x - 128;
-    if (bg_x < 0)
-        bg_x = 0;
-    if (bg_x > 512)
-        bg_x = 512;
-
-    int bg_y = y - 96;
-    if (bg_y < 0)
-        bg_y = 0;
-    if (bg_y > 320)
-        bg_y = 320;
-
-    // Pointer sprite position
-    int spr_x = (x - bg_x) - 4;
-    int spr_y = (y - bg_y) - 4;
-    NF_MoveSprite(1, 0, spr_x, spr_y);
-
-    // Update scroll
-    NF_ScrollBg(1, 0, bg_x, bg_y);
-}
-
-
-
 void fillRandomTiles() {
     for (int i = 0; i < 32; i++) {
         for (int j = 0; j < 32; j++) {
             NF_SetTileOfMap(0, bgLayers.tilesTop, i, j, rand() % 16);
             NF_SetTileOfMap(1, bgLayers.tilesBottom, i, j, rand() % 16 + 25); //25
-            // NF_SetTileOfMap(0, bgLayers.tilesTop, i, j, rand() % 64);
-            // NF_SetTileOfMap(1, bgLayers.tilesBottom, i, j, rand() % 64);
         }
     }
 }
@@ -252,7 +170,6 @@ void randomizeSomeTiles(int amount = 128) {
     for (int i = 0; i < amount; i++) {
         NF_SetTileOfMap(0, bgLayers.tilesTop, rand() % 32, rand() % 32, rand() % 16);
         NF_SetTileOfMap(1, bgLayers.tilesBottom, rand() % 32, rand() % 32, rand() % 24 + 32); //25
-        // NF_SetTileOfMap(1, bgLayers.tilesBottom, rand() % 64, rand() % 32, rand() % 64); //25
     }
 }
 
@@ -266,41 +183,15 @@ void fillChanceEmpty(int chance = 50) {
             empty = false;
         }
 
-        // NF_SetTileOfMap(0, bgLayers.tilesTop, rand() % 32, rand() % 32, empty ? 0 : rand() % 16);
-        // NF_SetTileOfMap(1, bgLayers.tilesBottom, rand() % 32, rand() % 32, empty ? 0 : rand() % 24 + 32); //25
-        // NF_SetTileOfMap(1, bgLayers.tilesBottom, rand() % 64, rand() % 32, rand() % 64); //25
         NF_SetTileOfMap(1, bgLayers.tilesBottom, rand() % 32, rand() % 32, empty ? 0 : rand() % 16);
         NF_SetTileOfMap(0, bgLayers.tilesTop, rand() % 32, rand() % 32, empty ? 0 : rand() % 6 + 36); //25
     }
-}
-
-void printCursorPositionAndTileUnderCursor() {
-    // Print pointer position
-    char mytext[60];
-    sprintf(mytext,"x:%d  y:%d ", x, y);
-    NF_WriteText(0, 2, 2, 2, mytext);
-
-    // Print the color of the tile under the pointer
-    int tilenum = NF_GetTileOfMap(1, 0, x / 8, y / 8);
-    sprintf(mytext," %d   ", tilenum);
-    NF_WriteText(0, 2, 1, 4, mytext);
-}
-
-void printParticipants() {
-    char mytext[60];
-    // sprintf(mytext,"TEST TEST");
-    NF_WriteText(0, 2, 4, 4, mytext);
 }
 
 
 void updateBothVramMaps() {
     NF_UpdateVramMap(0, bgLayers.tilesTop);
     NF_UpdateVramMap(1, bgLayers.tilesBottom);
-}
-
-void scaleAlgorave() {
-    NF_AffineBgTransform(0, bgLayers.algoraveText, 512, 512, 0, 0);
-    NF_AffineBgMove(0, bgLayers.algoraveText, 100, 0, 0);
 }
 
 void drawSimplexNoise(float scale = 1) {
@@ -321,25 +212,24 @@ void drawSimplexNoise(float scale = 1) {
     }
 }
 
-void updateParallelProblems(bool controlledByTouch = false) {
-    if (controlledByTouch && behaviours.parallelProblemsScaleControlledByTouch) {
-        parallelProblemsTransform.scale = lerp(touch.py, parallelProblemsTransform.scale, 4);
+void updateBby(bool controlledByTouch = false) {
+    if (controlledByTouch && behaviours.bbyScaleControlledByTouch) {
+        bbyTransform.scale = lerp(touch.py, bbyTransform.scale, 4);
     } else {
-        parallelProblemsTransform.scale = lerp(parallelProblemsTransform.scale, behaviours.parallelProblemsVisible ? 64 : 0, 32);
+        bbyTransform.scale = lerp(bbyTransform.scale, behaviours.bbyVisible ? 64 : 0, 32);
     }
 
-    if (behaviours.parallelProblemsSpinning) {
-        parallelProblemsTransform.rotation += 10;
-        if (parallelProblemsTransform.rotation > 512)
-            parallelProblemsTransform.rotation -= 512;
+    if (behaviours.bbySpinning) {
+        bbyTransform.rotation += 10;
+        if (bbyTransform.rotation > 512)
+            bbyTransform.rotation -= 512;
     } else {
-        parallelProblemsTransform.rotation = lerp(0, parallelProblemsTransform.rotation, 128);
+        bbyTransform.rotation = lerp(0, bbyTransform.rotation, 128);
     }
     
-
     // Apply rotation and scale
-    NF_Rotate3dSprite(spriteIndexes.parallelProblems, 0, parallelProblemsTransform.rotation, 0);
-    NF_Scale3dSprite(spriteIndexes.parallelProblems, parallelProblemsTransform.scale, parallelProblemsTransform.scale);
+    NF_Rotate3dSprite(spriteIndexes.bby, 0, bbyTransform.rotation, 0);
+    NF_Scale3dSprite(spriteIndexes.bby, bbyTransform.scale, bbyTransform.scale);
 }
 
 
@@ -372,8 +262,8 @@ int main(int argc, char **argv)
         | Toggle behaviours
         */
         if (down & KEY_DOWN || piano & PIANO_C) {
-            behaviours.parallelProblemsVisible = !behaviours.parallelProblemsVisible;
-            if (behaviours.parallelProblemsVisible) {
+            behaviours.bbyVisible = !behaviours.bbyVisible;
+            if (behaviours.bbyVisible) {
                 // NF_CreateTiledBg(0, bgLayers.algoraveText, "algoraveText");
             } else {
                 // NF_CreateTiledBg(0, bgLayers.algoraveText, "algoraveTextEmpty");
@@ -389,15 +279,15 @@ int main(int argc, char **argv)
         }
 
         if (down & KEY_Y || piano & PIANO_F) {
-            behaviours.parallelProblemsVisible = !behaviours.parallelProblemsVisible;
+            behaviours.bbyVisible = !behaviours.bbyVisible;
         }
 
         if (down & KEY_X || piano & PIANO_G) {
-            behaviours.parallelProblemsSpinning = !behaviours.parallelProblemsSpinning;
+            behaviours.bbySpinning = !behaviours.bbySpinning;
         }
 
         if (down & KEY_L || piano & PIANO_A) {
-            behaviours.parallelProblemsScaleControlledByTouch = !behaviours.parallelProblemsScaleControlledByTouch;
+            behaviours.bbyScaleControlledByTouch = !behaviours.bbyScaleControlledByTouch;
         }
 
         
@@ -408,11 +298,6 @@ int main(int argc, char **argv)
         |--------------------------------------------------------------------------
         | Excecute behaviours
         */
-        
-        if (behaviours.movingMapWithTouch) {
-            updateMapScroll(keys);
-        }
-
         if (behaviours.simplexNoise) {
             // PERLIN OPTIONS
             if (keys & KEY_LEFT) {
@@ -428,15 +313,10 @@ int main(int argc, char **argv)
         }
 
 
-        updateParallelProblems(keys & KEY_TOUCH);
+        updateBby(keys & KEY_TOUCH);
 
 
 
-        
-        
-        // NF_AffineBgMove(0, bgLayers.algoraveText, sin(t / 1000.0) * 80.0, 0, 0);
-        
-        
         // Draw all 3D sprites
         NF_Draw3dSprites();
 
