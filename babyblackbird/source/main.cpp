@@ -25,7 +25,12 @@ struct {
 } eclipse;
 
 
-// Insects
+// Bugs
+struct Bug {
+    int x = 0;
+    int y = 0;
+    int scale = 64;
+} bugs[4];
 
 // Heart
 struct {
@@ -40,9 +45,8 @@ struct Star {
     int x;
     int y;
     int blinkEveryN;
-};
+} stars[20];
 
-Star stars[20];
 
 // Clouds
 const int numClouds = 12;
@@ -50,9 +54,7 @@ struct Cloud {
     int x;
     int y;
     int scale;
-};
-
-Cloud clouds[numClouds];
+} clouds[numClouds];
 
 // Sprites
 struct {
