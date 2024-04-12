@@ -67,7 +67,7 @@ struct {
 
 
 struct {
-    int heart = 7;
+    int heart = 6;
     int bug1 = 2;
     int bug2 = 3;
     int bug3 = 4;
@@ -348,8 +348,9 @@ void fillChanceEmpty(int chance = 50) {
 
 
 void sparkleStars() {
+    int base = 47;
     for (int i = 0; i < 20; i++) {
-        NF_SetTileOfMap(0, bgLayers.tilesTop, stars[i].x, stars[i].y, t % stars[i].blinkEveryN < 5 ? 50 : 49);
+        NF_SetTileOfMap(0, bgLayers.tilesTop, stars[i].x, stars[i].y, t % stars[i].blinkEveryN < 5 ? base+1: base);
     }
 }
 
