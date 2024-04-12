@@ -29,8 +29,9 @@ struct {
 struct Bug {
     int x = 0;
     int y = 0;
-    int scale = 64;
 } bugs[4];
+
+
 
 // Heart
 struct {
@@ -69,11 +70,12 @@ struct {
 
 
 struct {
-    int heart = 6;
-    int bug1 = 2;
-    int bug2 = 3;
-    int bug3 = 4;
-    int bug4 = 5;
+    int heart = 9;
+    
+    int bug1 = 5;
+    int bug2 = 6;
+    int bug3 = 7;
+    int bug4 = 8;
 } spriteBottomIndexes;
 
 
@@ -181,16 +183,21 @@ void setupbbySprite() {
 }
 
 void setupBugs() {
-    // NF_LoadSpriteGfx("sprite/bug1", spriteIndexes.bug1, 16, 16);
-    // NF_LoadSpriteGfx("sprite/bug2", spriteIndexes.bug2, 16, 16);
-    // NF_LoadSpriteGfx("sprite/bug3", spriteIndexes.bug3, 16, 16);
-    // NF_LoadSpriteGfx("sprite/bug4", spriteIndexes.bug4, 16, 16);
+    NF_LoadSpriteGfx("sprite/bug1", spriteBottomIndexes.bug1, 16, 16);
+    NF_LoadSpriteGfx("sprite/bug2", spriteBottomIndexes.bug2, 16, 16);
+    NF_LoadSpriteGfx("sprite/bug3", spriteBottomIndexes.bug3, 16, 16);
+    NF_LoadSpriteGfx("sprite/bug4", spriteBottomIndexes.bug4, 16, 16);
 
 
-    // NF_VramSpriteGfx(1, spriteIndexes.bug1, spriteIndexes.bug1, true);
-    // NF_VramSpriteGfx(1, spriteIndexes.bug2, spriteIndexes.bug2, true);
-    // NF_VramSpriteGfx(1, spriteIndexes.bug3, spriteIndexes.bug3, true);
-    // NF_VramSpriteGfx(1, spriteIndexes.bug4, spriteIndexes.bug4, true);
+    NF_VramSpriteGfx(1, spriteBottomIndexes.bug1, spriteBottomIndexes.bug1, true);
+    NF_VramSpriteGfx(1, spriteBottomIndexes.bug2, spriteBottomIndexes.bug2, true);
+    NF_VramSpriteGfx(1, spriteBottomIndexes.bug3, spriteBottomIndexes.bug3, true);
+    NF_VramSpriteGfx(1, spriteBottomIndexes.bug4, spriteBottomIndexes.bug4, true);
+
+    // Add bugs
+    bugs[0] = {0, 0};
+    bugs[1] = {16, 0};
+    
 
 
     // NF_CreateSprite(1, spriteIndexes.bug1, spriteIndexes.bug1, 1, 0, 16);
