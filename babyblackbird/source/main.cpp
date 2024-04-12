@@ -91,7 +91,7 @@ int t = 0;
 
 // Global state 
 int currentTile = 0;
-int tileOffset = 50;
+int tileOffset = 47;
 
 float perlinScale = 1;
 
