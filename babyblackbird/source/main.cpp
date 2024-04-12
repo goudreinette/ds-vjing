@@ -18,6 +18,16 @@ struct {
 } bgLayers;
 
 
+// Eclipse
+struct {
+    float rotation = 0;
+    float scale = 64;
+} eclipse;
+
+
+// Insects
+
+
 // Stars
 struct Star {
     int x;
@@ -28,20 +38,28 @@ struct Star {
 Star stars[20];
 
 // Clouds
+const int numClouds = 12;
 struct Cloud {
     int x;
     int y;
     int scale;
 };
 
-Cloud clouds[10];
+Cloud clouds[numClouds];
 
 // Sprites
 struct {
     int bby = 1;
     int sparkle1 = 2;
     int sparkle2 = 3;
-    int clouds = 4; // 2-9
+    int clouds = 4; // 4-16
+    int eggcell = 16;
+    int rein = 17;
+
+    int bug1 = 18;
+    int bug2 = 19;
+    int bug3 = 20;
+    int bug4 = 21;
 } spriteIndexes;
 
 
@@ -51,6 +69,7 @@ s16 y = 96;
 
 // Colors 
 const int darkBlue = ARGB16(1, 4, 5, 10);
+const int purple = ARGB16(1, 16, 14, 20);
 const int picoWhite = ARGB16(1, 31, 30, 29);
 const int black = ARGB16(1, 0, 0, 0);
 
@@ -60,7 +79,7 @@ int t = 0;
 
 // Global state 
 int currentTile = 0;
-int tileOffset = 0;
+int tileOffset = 50;
 
 float perlinScale = 1;
 
@@ -69,11 +88,18 @@ struct {
     int rotation = 0;
 } bbyTransform;
 
+struct {
+    int scale = 64;
+    int rotation = 0;
+} reinTransform;
+
 
 
 // Behaviours
 struct {
     bool bbyVisible = true;
+    bool reinVisible = false;
+    bool eclipseVisible = true;
     bool bbySpinning = false;
     bool bbyScaleControlledByTouch = false;
 
@@ -140,6 +166,46 @@ void setupbbySprite() {
     NF_Create3dSprite(spriteIndexes.bby, spriteIndexes.bby, spriteIndexes.bby, 0, 16);
 }
 
+void setupBugs() {
+    // NF_LoadSpriteGfx("sprite/bug1", spriteIndexes.bug1, 16, 16);
+    // NF_LoadSpriteGfx("sprite/bug2", spriteIndexes.bug2, 16, 16);
+    // NF_LoadSpriteGfx("sprite/bug3", spriteIndexes.bug3, 16, 16);
+    // NF_LoadSpriteGfx("sprite/bug4", spriteIndexes.bug4, 16, 16);
+
+
+    // NF_VramSpriteGfx(1, spriteIndexes.bug1, spriteIndexes.bug1, true);
+    // NF_VramSpriteGfx(1, spriteIndexes.bug2, spriteIndexes.bug2, true);
+    // NF_VramSpriteGfx(1, spriteIndexes.bug3, spriteIndexes.bug3, true);
+    // NF_VramSpriteGfx(1, spriteIndexes.bug4, spriteIndexes.bug4, true);
+
+
+    // NF_CreateSprite(1, spriteIndexes.bug1, spriteIndexes.bug1, 1, 0, 16);
+    // NF_CreateSprite(1, spriteIndexes.bug2, spriteIndexes.bug2, 1, 16, 16);
+    // NF_CreateSprite(1, spriteIndexes.bug3, spriteIndexes.bug3, 1, 32, 16);
+    // NF_CreateSprite(1, spriteIndexes.bug4, spriteIndexes.bug4, 1, 54, 16);
+}
+
+
+void setupReinSprite() {
+    NF_LoadSpriteGfx("sprite/reincomputer", spriteIndexes.rein, 256, 64);
+    NF_LoadSpritePal("sprite/reincomputer", spriteIndexes.rein);
+
+    NF_Vram3dSpriteGfx(spriteIndexes.rein, spriteIndexes.rein, true);
+    NF_Vram3dSpritePal(spriteIndexes.rein, spriteIndexes.rein);
+    NF_Create3dSprite(spriteIndexes.rein, spriteIndexes.rein, spriteIndexes.rein, 0, 54);
+}
+
+void setupEggCell() {
+    NF_LoadSpriteGfx("sprite/eggcell", spriteIndexes.eggcell, 128, 128);
+    NF_LoadSpritePal("sprite/eggcell", spriteIndexes.eggcell);
+
+    NF_Vram3dSpriteGfx(spriteIndexes.eggcell, spriteIndexes.eggcell, false);
+    NF_Vram3dSpritePal(spriteIndexes.eggcell, spriteIndexes.eggcell);
+
+    NF_Create3dSprite(spriteIndexes.eggcell, spriteIndexes.eggcell, spriteIndexes.eggcell, 64, 25);
+    NF_Scale3dSprite(spriteIndexes.eggcell, 32, 32);
+}
+
 
 void setupCloudsSprites() {
     NF_LoadSpriteGfx("sprite/cloud", spriteIndexes.clouds, 64, 64);
@@ -156,10 +222,12 @@ void setupCloudsSprites() {
     clouds[5] = {140, 170, 1};
     clouds[6] = {180, 160, 1};
     clouds[7] = {220, 140, 1};
-    clouds[8] = {-32, 170, 1};
+    clouds[8] = {-32, 160, 1};
     clouds[9] = {220, -48, 1};
+    clouds[10] = {20, 170, 1};
+    clouds[11] = {60, 184, 1};
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < numClouds; i++) {
         NF_Create3dSprite(spriteIndexes.clouds + i, spriteIndexes.clouds, spriteIndexes.clouds, clouds[i].x, clouds[i].y);
     }
 }
@@ -192,7 +260,7 @@ void setupGraphics() {
 
     // BG colors
     setBackdropColor(darkBlue); // Set the backdrop color to pico white
-    setBackdropColorSub(darkBlue); // Set the backdrop color to pico white
+    setBackdropColorSub(purple); // Set the backdrop color to pico white
 
     // Initialize tiled backgrounds system
     NF_InitTiledBgBuffers();    // Initialize storage buffers
@@ -202,12 +270,17 @@ void setupGraphics() {
 
     // Initialize sprite system
     NF_InitSpriteBuffers();     // Initialize storage buffers
+    // NF_InitSpriteSys(0);        // Initialize sprite system for the top screen
+    NF_InitSpriteSys(1);        // Initialize sprite system for the top screen
 
     setupbbySprite();
+    setupReinSprite();
     setupCloudsSprites();
     setupSparkleSprites();
     setupStars();
     setupTilesBg();
+    setupEggCell();
+    setupBugs();
 
     NF_Sort3dSprites();
 }
@@ -251,7 +324,7 @@ void fillChanceEmpty(int chance = 50) {
 
 void sparkleStars() {
     for (int i = 0; i < 20; i++) {
-        NF_SetTileOfMap(0, bgLayers.tilesTop, stars[i].x, stars[i].y, t % stars[i].blinkEveryN < 5 ? 51 : 50);
+        NF_SetTileOfMap(0, bgLayers.tilesTop, stars[i].x, stars[i].y, t % stars[i].blinkEveryN < 5 ? 50 : 49);
     }
 }
 
@@ -277,6 +350,22 @@ void drawSimplexNoise(float scale = 1) {
             }
         }
     }
+}
+
+void updateRein() {
+    reinTransform.scale = lerp(reinTransform.scale, behaviours.reinVisible ? 64 : 0, 32);
+
+    if (behaviours.bbySpinning) {
+        reinTransform.rotation += 10;
+        if (reinTransform.rotation > 512)
+            reinTransform.rotation -= 512;
+    } else {
+        reinTransform.rotation = lerp(0, reinTransform.rotation, 128);
+    }
+
+    // Apply rotation and scale
+    NF_Rotate3dSprite(spriteIndexes.rein, 0, reinTransform.rotation, 0);
+    NF_Scale3dSprite(spriteIndexes.rein, reinTransform.scale, reinTransform.scale);
 }
 
 void updateBby(bool controlledByTouch = false) {
@@ -309,7 +398,7 @@ void updateBby(bool controlledByTouch = false) {
 
 
 void updateClouds() {
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < numClouds; i++) {
         // do simplex random
         float x_offset = SimplexNoise::noise(0.01 * i * 100, 0.01, t / 100.0) * 2;
         float y_offset = SimplexNoise::noise(0.01 * i  * 100 + 1000, 0.01, t / 100.0) * 2;
@@ -317,6 +406,17 @@ void updateClouds() {
         NF_Move3dSprite(spriteIndexes.clouds + i, clouds[i].x + x_offset, clouds[i].y + y_offset);
         // NF_Scale3dSprite(spriteIndexes.clouds + i, bbyTransform.scale + scale_offset, bbyTransform.scale + scale_offset);
     }
+}
+
+void updateEclipse() {
+    eclipse.rotation += .5;
+
+    float targetScale = behaviours.eclipseVisible ? sin(t / 50.0) * 5.0 + 50.0, sin(t / 50.0) * 5.0 + 50.0 : 0;
+    
+    eclipse.scale = lerp(eclipse.scale, targetScale, 32);
+    NF_Rotate3dSprite(spriteIndexes.eggcell, 0, 0, eclipse.rotation);
+    NF_Scale3dSprite(spriteIndexes.eggcell, eclipse.scale, eclipse.scale);
+    // NF_Show3dSprite(spriteIndexes.eggcell, behaviours.eclipseVisible);
 }
 
 
@@ -350,11 +450,6 @@ int main(int argc, char **argv)
         */
         if (down & KEY_DOWN || piano & PIANO_C) {
             behaviours.bbyVisible = !behaviours.bbyVisible;
-            if (behaviours.bbyVisible) {
-                // NF_CreateTiledBg(0, bgLayers.algoraveText, "algoraveText");
-            } else {
-                // NF_CreateTiledBg(0, bgLayers.algoraveText, "algoraveTextEmpty");
-            }
         }
 
         if (down & KEY_A || piano & PIANO_D) {
@@ -377,6 +472,14 @@ int main(int argc, char **argv)
             behaviours.bbyScaleControlledByTouch = !behaviours.bbyScaleControlledByTouch;
         }
 
+        if (down & KEY_UP) {
+            behaviours.eclipseVisible = !behaviours.eclipseVisible;
+        }
+
+         if (down & KEY_RIGHT) {
+            behaviours.reinVisible = !behaviours.reinVisible;
+        }
+
         /*
         |--------------------------------------------------------------------------
         | Excecute behaviours
@@ -384,7 +487,7 @@ int main(int argc, char **argv)
         if (behaviours.simplexNoise) {
             // PERLIN OPTIONS
             if (keys & KEY_LEFT) {
-                tileOffset = touch.px * 0.2;
+                tileOffset = touch.px * 0.24;
                 perlinScale = touch.py * 0.02;
             }
             drawSimplexNoise(perlinScale);
@@ -398,9 +501,12 @@ int main(int argc, char **argv)
         }
 
         sparkleStars();
+        updateEclipse();
 
 
         updateBby(keys & KEY_TOUCH);
+        updateRein();
+
         updateClouds();
 
 
