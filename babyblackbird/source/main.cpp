@@ -360,22 +360,41 @@ void updateBothVramMaps() {
     NF_UpdateVramMap(1, bgLayers.tilesBottom);
 }
 
-void drawSimplexNoise(float scale = 1) {
+void drawSimplexNoise(float scale = 1, bool drawTop = true) {
     for (int i = 0; i < 32; i++) {
         for (int j = 0; j < 32; j++) {
             if (rand() % 100 > 85) {
                 float t_ = t * 0.01;
-                float value0 = SimplexNoise::noise(0.01 * i * scale, 0.01 * j * scale, t_);
+
+                if (drawTop) {
+                    float value0 = SimplexNoise::noise(0.01 * i * scale, 0.01 * j * scale, t_);
+                    int tile0 = abs(value0) * 8 + tileOffset;
+                    NF_SetTileOfMap(0, bgLayers.tilesTop, i, j, tile0);
+                }
+                
+                // Bottom
                 float value1 = SimplexNoise::noise(0.01 * i * scale, 0.01 * (j + 24) * scale, t_);
-
-                int tile0 = abs(value0) * 8 + tileOffset;
                 int tile1 = abs(value1) * 8 + tileOffset;
-
-                NF_SetTileOfMap(0, bgLayers.tilesTop, i, j, tile0);
                 NF_SetTileOfMap(1, bgLayers.tilesBottom, i, j, tile1);
             }
         }
     }
+}
+
+void eggCellPulseTiles() {
+    // Radiate in a circle from the center outwards
+    for (int i = 0; i < 32; i++) {
+        for (int j = 0; j < 24; j++) {
+            if (rand() % 100 > 70) {
+                int distance = sqrt(pow(i - 16, 2) + pow(j -10, 2));
+                int tile = ((distance - t / 5) % 6) + 51;
+                NF_SetTileOfMap(0, bgLayers.tilesTop, i, j, (int) tile);
+            }
+            
+        }
+
+    }
+
 }
 
 void updateRein() {
@@ -522,14 +541,18 @@ int main(int argc, char **argv)
                 tileOffset = touch.px * 0.24;
                 perlinScale = touch.py * 0.02;
             }
-            drawSimplexNoise(perlinScale);
+            drawSimplexNoise(perlinScale, !behaviours.eclipseVisible);
+        }
+
+        if (behaviours.eclipseVisible) {
+            eggCellPulseTiles();
         }
 
         if (behaviours.fillRandomTiles) {
             int emptyChance = touch.py;
             fillChanceEmpty(emptyChance);
         } else {
-            // sparkleStars();
+            sparkleStars();
         }
 
         sparkleStars();
@@ -549,6 +572,7 @@ int main(int argc, char **argv)
 
         // Tell the GPU to draw the scene and wait until it's done
         glFlush(0);
+
 
         // Change the tile under the pointer if the user presses a button
         // randomizeSomeTiles(25);
