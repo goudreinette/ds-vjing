@@ -27,6 +27,13 @@ struct {
 
 // Insects
 
+// Heart
+struct {
+    int x = 170;
+    int y = 105;
+    // int scale;
+    // int rotation;
+} heart;
 
 // Stars
 struct Star {
@@ -56,11 +63,16 @@ struct {
     int eggcell = 16;
     int rein = 17;
 
-    int bug1 = 18;
-    int bug2 = 19;
-    int bug3 = 20;
-    int bug4 = 21;
 } spriteIndexes;
+
+
+struct {
+    int heart = 7;
+    int bug1 = 2;
+    int bug2 = 3;
+    int bug3 = 4;
+    int bug4 = 5;
+} spriteBottomIndexes;
 
 
 // Background scroll variables
@@ -185,6 +197,18 @@ void setupBugs() {
     // NF_CreateSprite(1, spriteIndexes.bug4, spriteIndexes.bug4, 1, 54, 16);
 }
 
+void setupHeart() {
+    NF_LoadSpriteGfx("sprite/heart", spriteBottomIndexes.heart, 64, 64);
+    NF_LoadSpritePal("sprite/heart", spriteBottomIndexes.heart);
+
+    NF_VramSpriteGfx(1, spriteBottomIndexes.heart, spriteBottomIndexes.heart, true);
+    NF_VramSpritePal(1, spriteBottomIndexes.heart, spriteBottomIndexes.heart);
+
+    NF_CreateSprite(1, spriteBottomIndexes.heart, spriteBottomIndexes.heart, spriteBottomIndexes.heart, heart.x, heart.y);
+
+    // NF_VramSpriteGfx(1, spriteIndexes.bug2, spriteIndexes.bug2, true);
+}
+
 
 void setupReinSprite() {
     NF_LoadSpriteGfx("sprite/reincomputer", spriteIndexes.rein, 256, 64);
@@ -281,6 +305,7 @@ void setupGraphics() {
     setupTilesBg();
     setupEggCell();
     setupBugs();
+    setupHeart();
 
     NF_Sort3dSprites();
 }
@@ -396,6 +421,12 @@ void updateBby(bool controlledByTouch = false) {
     NF_Scale3dSprite(spriteIndexes.bby, bbyTransform.scale, bbyTransform.scale);
 }
 
+void updateHeart() {
+    float x_offset = SimplexNoise::noise(1, 0.01, t / 100.0) * 2;
+    float y_offset = SimplexNoise::noise(1000, 0.01, t / 100.0) * 2;
+    NF_MoveSprite(1, spriteBottomIndexes.heart, heart.x + x_offset, heart.y + y_offset);
+}
+
 
 void updateClouds() {
     for (int i = 0; i < numClouds; i++) {
@@ -508,6 +539,7 @@ int main(int argc, char **argv)
         updateRein();
 
         updateClouds();
+        updateHeart();
 
 
 
