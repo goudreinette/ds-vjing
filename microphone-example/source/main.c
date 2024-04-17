@@ -22,7 +22,7 @@ u32 mic_buffer_size = sample_rate * 2 / 30;
 //mic stream handler
 void micHandler(void* data, int length)
 {
-    DC_InvalidateRange(data, length);
+    DC_InvalidateRange(data, length);   
     
     s16 *ptr;
     int i;

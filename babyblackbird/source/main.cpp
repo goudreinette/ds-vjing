@@ -304,7 +304,7 @@ void setupGraphics() {
     // Initialize sprite system
     NF_InitSpriteBuffers();     // Initialize storage buffers
     // NF_InitSpriteSys(0);        // Initialize sprite system for the top screen
-    NF_InitSpriteSys(1);        // Initialize sprite system for the top screen
+    NF_InitSpriteSys(1);        // Initialize sprite system for the bottom screen
 
     setupbbySprite();
     setupReinSprite();
@@ -399,11 +399,8 @@ void eggCellPulseTiles() {
                 int tile = ((distance - t / 5) % 6) + 51;
                 NF_SetTileOfMap(0, bgLayers.tilesTop, i, j, (int) tile);
             }
-            
         }
-
     }
-
 }
 
 void updateRein() {
