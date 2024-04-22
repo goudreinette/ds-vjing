@@ -12,7 +12,8 @@
         "limits": "cpp",
         "tuple": "cpp",
         "variant": "cpp",
-        "math.h": "c"
+        "math.h": "c",
+        "filesystem.h": "c"
     },
     "terminal.integrated.defaultProfile.windows": "MSYS2",
     "terminal.integrated.profiles.windows": {
