@@ -10,6 +10,7 @@
                 "${workspaceFolder}/**",
                 "/opt/devkitpro/libnds/include/**",
                 "/opt/devkitpro/nflib/include/**",
+                "/opt/devkitpro/nitro-engine/include/**",
                 "/opt/devkitpro/devkitARM/include/**",
                 "/opt/devkitpro/devkitARM/arm-none-eabi/include/**"
             ],
