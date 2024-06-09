@@ -29,6 +29,13 @@
 double t;
 double glitch_t;
 
+typedef struct {
+    bool wasFlipped;
+    int x;
+    int y;
+    bool h;
+    bool v;
+} FlippedTile;
 
 
 typedef struct {
@@ -174,6 +181,8 @@ int main(int argc, char *argv[])
     SceneData scene = { 0 };
     scene.polyId = 0;
 
+    FlippedTile lastFlippedTile = { false, 0, 0, false, false };
+
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);
     irqSet(IRQ_HBLANK, NE_HBLFunc);
@@ -269,7 +278,35 @@ int main(int argc, char *argv[])
             }
         }
 
-                
+        // Bottom screen special effects
+        if (lastFlippedTile.wasFlipped == true) {
+            if (lastFlippedTile.h) {
+                NF_SetTileHflip(1, 0, lastFlippedTile.x, lastFlippedTile.y);
+            } else {
+                NF_SetTileVflip(1, 0, lastFlippedTile.x, lastFlippedTile.y);
+            }
+            NF_UpdateVramMap(1, 0);
+            lastFlippedTile.wasFlipped = false;
+        }
+
+        if (rand() % 5 == 0 || glitch_t > 0) {
+            lastFlippedTile.wasFlipped = true;
+            lastFlippedTile.x = rand() % 32;
+            lastFlippedTile.y = rand() % 20;
+            if (rand() % 2 == 0) {
+                NF_SetTileHflip(1, 0, lastFlippedTile.x, lastFlippedTile.y);
+                lastFlippedTile.h = true;
+                lastFlippedTile.v = false;
+            } else {
+                NF_SetTileVflip(1, 0, lastFlippedTile.x, lastFlippedTile.y);
+                lastFlippedTile.h = false;
+                lastFlippedTile.v = true;
+            }
+            
+            NF_UpdateVramMap(1, 0);
+        }
+        
+            
         // Draw scene
         NE_ProcessArg(Draw3DScene, &scene);
     }
