@@ -16,3 +16,8 @@ angel/models/angel-lo.blend
 angel/models/angel-lo.blend1
 angel/models/angel.blend
 angel/models/angel.blend1
+
+
+
+**/*.blend
+**/*.blend1

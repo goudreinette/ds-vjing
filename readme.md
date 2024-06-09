@@ -13,7 +13,7 @@ chokidar "source/**.cpp" -c "make && open tilechange.nds"
 
 
 # Newest one
-chokidar "source/**.*" "assets/**.png" "assets/convert.sh" -c "sh convert-assets.sh && make clean && make && open microphone-sprite-size.nds" --initial true
+chokidar "source/**.*" "assets/**.png" "graphics/**.png" "assets.sh" -c "sh assets.sh && make clean && make && open data-lek.nds" --initial true
 
 # Transfer to DS and eject disc
 cp microphone-sprite-size.nds /Volumes/DS/
@@ -21,6 +21,9 @@ diskutil unmount DS
 
 # In one go
 cp microphone-sprite-size.nds /Volumes/DS/ && diskutil unmount DS
+
+
+chokidar "source/**.cpp" -c "make" --initial true
 ```
 
 

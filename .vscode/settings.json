@@ -13,7 +13,17 @@
         "tuple": "cpp",
         "variant": "cpp",
         "math.h": "c",
-        "filesystem.h": "c"
+        "filesystem.h": "c",
+        "biertje_bin.h": "c",
+        "nf_lib.h": "c",
+        "texture2.h": "c",
+        "rainbow.h": "c",
+        "texture.h": "c",
+        "texture3.h": "c",
+        "clippy_bin.h": "c",
+        "cloud_bin.h": "c",
+        "nemain.h": "c",
+        "paper_bin.h": "c"
     },
     "terminal.integrated.defaultProfile.windows": "MSYS2",
     "terminal.integrated.profiles.windows": {
