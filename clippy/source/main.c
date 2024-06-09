@@ -27,6 +27,7 @@
 
 // The time
 double t;
+double glitch_t;
 
 
 
@@ -216,7 +217,7 @@ int main(int argc, char *argv[])
     NF_InitTiledBgBuffers();
     NF_InitTiledBgSys(1);
 
-    NF_LoadTiledBg("tiles", "bg", 512, 512);
+    NF_LoadTiledBg("dialog", "bg", 512, 512);
     NF_CreateTiledBg(1, 0, "bg");
 
 
@@ -227,9 +228,11 @@ int main(int argc, char *argv[])
 
 
 
-    // Enable/update fog
+// Enable/update fog
     NE_FogEnable(shift, NE_White, 31, mass, depth);
-    
+
+    NE_SpecialEffectNoiseConfig(31);
+    // NE_SpecialEffectSet(NE_NOISE);
 
     while (1)
     {
@@ -241,21 +244,33 @@ int main(int argc, char *argv[])
         // Get keys information
         scanKeys();
         uint32_t keys = keysHeld();
+        uint32_t down = keysDown();
 
-        printf("\x1b[2;1Hit looks like you're afraid...");
 
-        printf("\x1b[5;1HBE NOT AFRAID");
+        // printf("\x1b[2;1Hit looks like you're afraid...");
+        // printf("\x1b[5;1HBE NOT AFRAID");
 
-        float y = sinf(t / 30) * .2;
-        float ry = sinf(t / 120) * 20;
+        // Special effects
+        if (down) {
+            glitch_t = 5;
+        }        
 
-        NE_ModelSetCoord(scene.angel, -3, y, 0);
-        NE_ModelSetRot(scene.angel, 0, 130 + ry, 0);
-        
-        // printf("\x1b[2;1HZ: %i", scene.angel->rz);
-        
+        if (glitch_t > 0) {
+            glitch_t--;
+            NE_SpecialEffectSet(NE_NOISE);
+        } else {
+            int r = rand() % 300;
+            if (r == 0) {
+                NE_SpecialEffectSet(NE_NOISE);
+            } else if (r == 1) {
+                NE_SpecialEffectSet(NE_SINE);
+            } else {
+                NE_SpecialEffectSet(NE_NONE);
+            }
+        }
+
+                
         // Draw scene
-
         NE_ProcessArg(Draw3DScene, &scene);
     }
 
