@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <NEMain.h>
 #include <math.h>
+#include <filesystem.h>
+#include <nf_lib.h>
 
 // First you have to put the .bin files in the data folder. This will generate
 // (after doing "make") some files named "binfilename_bin.h". For example,
@@ -23,7 +25,9 @@
 #include "texture3.h"
 #include "paper.h"
 
+// The time
 double t;
+
 
 
 typedef struct {
@@ -43,14 +47,10 @@ void Draw3DScene(void *arg)
     SceneData *scene = arg;
 
     NE_CameraUse(scene->camera);
-    // Set polygon format
-    // NE_PolyFormat(31, scene->polyId, NE_LIGHT_0, NE_CULL_BACK, NE_TOON_HIGHLIGHT_SHADING);
-    
-    
-    // Draw anger
-    NE_ModelDraw(scene->angel);
 
-    // Draw paper
+    NE_PolyFormat(31, scene->polyId, NE_LIGHT_0, NE_CULL_BACK, NE_FOG_ENABLE);
+
+    // Draw paper ------
     float y = sinf((t + 10) / 30) * .05;
     float ry = sinf((t - 60) / 120) * 10;
     NE_ModelSetCoord(scene->paper, -3, y,0);
@@ -58,32 +58,40 @@ void Draw3DScene(void *arg)
     NE_ModelDraw(scene->paper);
 
 
-    // Draw clouds
-    
+    // Draw clouds ------
     // cloud left
-    NE_PolyFormat(22, scene->cloudPolyId, NE_LIGHT_0, NE_CULL_BACK, 0);
+    NE_PolyFormat(22, scene->cloudPolyId, NE_LIGHT_0, NE_CULL_BACK, NE_FOG_ENABLE);
     y = sinf((t + 360) / 30) * .2;
     ry = sinf(t / 120) * 20;
     NE_ModelScale(scene->cloud, 3,3,3);
     NE_ModelSetCoord(scene->cloud, 5, -3 + y, -10);
     NE_ModelSetRot(scene->cloud, 0, 120, 0);
     NE_ModelDraw(scene->cloud);
+    
 
     // cloud top right
     y = sinf((t + 420) / 30) * .2;
-    NE_PolyFormat(24, scene->cloudPolyId, NE_LIGHT_0, NE_CULL_BACK, 0);
+    NE_PolyFormat(24, scene->cloudPolyId, NE_LIGHT_0, NE_CULL_BACK, NE_FOG_ENABLE);
     NE_ModelScale(scene->cloud, 2,2,2);
     NE_ModelSetCoord(scene->cloud, 20, 4 + y, 14);
     NE_ModelSetRot(scene->cloud, 0, 80, 0);
     NE_ModelDraw(scene->cloud);
 
     // cloud front
-    NE_PolyFormat(20, scene->cloudPolyId, NE_LIGHT_0, NE_CULL_BACK, 0);
+    NE_PolyFormat(20, scene->cloudPolyId, NE_LIGHT_0, NE_CULL_BACK, NE_FOG_ENABLE);
     y = sinf((t - 360) / 30) * .2;
     NE_ModelScale(scene->cloud, 1,1,1);
     NE_ModelSetCoord(scene->cloud, -5.5, -1 + y, 3);
     NE_ModelSetRot(scene->cloud, 0, 120, 0);
     NE_ModelDraw(scene->cloud);
+
+    // Draw angel ------
+     y = sinf(t / 30) * .2;
+     ry = sinf(t / 120) * 40;
+    NE_ModelSetCoord(scene->angel, -3, y, 0);
+    NE_ModelSetRot(scene->angel, 0, 130 + ry, 0);
+    NE_PolyFormat(31, scene->polyId, NE_LIGHT_0, NE_CULL_BACK, NE_FOG_ENABLE);
+    NE_ModelDraw(scene->angel);
 }
 
 void createAngel(SceneData *scene) {
@@ -158,6 +166,9 @@ void createClouds(SceneData *scene) {
 
 int main(int argc, char *argv[])
 {
+    nitroFSInit(NULL);
+    NF_SetRootFolder("NITROFS");
+
 
     SceneData scene = { 0 };
     scene.polyId = 0;
@@ -201,12 +212,24 @@ int main(int argc, char *argv[])
     setBackdropColorSub(RGB8(95,205,228));
 
 
+    NF_Set2D(1, 0);
+    NF_InitTiledBgBuffers();
+    NF_InitTiledBgSys(1);
 
-    // // Load background files from NitroFS
-    // NF_LoadTiledBg("bg", "bg", 512, 512);
+    NF_LoadTiledBg("tiles", "bg", 512, 512);
+    NF_CreateTiledBg(1, 0, "bg");
 
-    // // Create top screen backgrounds
-    // NF_CreateTiledBg(0, 0, "bg");
+
+    // Wrap values of parameters
+    u16 depth = 0x7C00;
+    u8 shift = 2;
+    u8 mass = 2;
+
+
+
+    // Enable/update fog
+    NE_FogEnable(shift, NE_White, 31, mass, depth);
+    
 
     while (1)
     {
@@ -232,8 +255,11 @@ int main(int argc, char *argv[])
         // printf("\x1b[2;1HZ: %i", scene.angel->rz);
         
         // Draw scene
+
         NE_ProcessArg(Draw3DScene, &scene);
     }
 
     return 0;
 }
+
+

@@ -23,7 +23,7 @@ diskutil unmount DS
 cp microphone-sprite-size.nds /Volumes/DS/ && diskutil unmount DS
 
 
-chokidar "source/**.cpp" -c "make" --initial true
+chokidar "source/**.c" -c "make" --initial true
 ```
 
 
