@@ -17,7 +17,7 @@
 #include "scene_data.hpp"
 #include "hearts_and_comments.hpp"
 #include "wout3d.hpp"
-
+#include "mic.hpp"
 
 
 void draw_3d_scene(void *arg)
@@ -28,10 +28,12 @@ void draw_3d_scene(void *arg)
 
     scanKeys();
     uint32_t keys_held = keysHeld();
+    uint32_t keys_down = keysDown();
 
 
+    // different scenes and features
     hearts_and_comments::update_draw_hearts(scene, keys_held);
-    wout_bust::update_draw(scene, keys_held);
+    wout_bust::update_draw(scene, keys_held, keys_down);
 }
 
 
@@ -41,6 +43,9 @@ int main(int argc, char *argv[])
 {
     nitroFSInit(NULL);
     NF_SetRootFolder("NITROFS");
+
+
+    mic::setup();
 
     // setup scene
     scene_data scene = {
@@ -74,10 +79,11 @@ int main(int argc, char *argv[])
 
     // We set up a light and its color
     NE_LightSet(0, NE_White, -0.5, -0.5, -0.5);
-    // NE_LightSet(2, NE_White, -1, -3, -0.5);
+    NE_LightSet(2, NE_White, -1, -3, -0.5);
 
     // NE_ClearColorSet(RGB8(69,40,60), 31, 63);
-    NE_ClearColorSet(RGB8(95,205,228), 31, 63);
+//    NE_ClearColorSet(RGB8(95,205,228), 31, 63);
+    NE_ClearColorSet(RGB8(0,0,0), 31, 63);
 
     // NE_ClearColorSet(NE_White, 31, 63);
     // setBackdropColorSub(RGB8(34,32,52));
@@ -87,12 +93,12 @@ int main(int argc, char *argv[])
     // Wrap values of parameters
 
     // Enable/update fog
-    NE_FogEnable(2, NE_White, 31, 2, 0x7C00);
+//    NE_FogEnable(2, NE_White, 31, 2, 0x7C00);
 
     NE_SpecialEffectNoiseConfig(31);
     // NE_SpecialEffectSet(NE_NOISE);
 
-    while (1)
+    while (true)
     {
         t++;
 
@@ -100,11 +106,12 @@ int main(int argc, char *argv[])
         NE_WaitForVBL(NE_UpdateFlags::NE_UPDATE_PHYSICS);
 
         // Get keys information
-        scanKeys();
-        uint32_t keys = keysHeld();
-        uint32_t down = keysDown();
+//        scanKeys();
+//        uint32_t keys = keysHeld();
+//        uint32_t down = keysDown();
 
 
+//        printf("\n \n %i",  mic::peak);
 
         // Special effects
 //        if (down) {

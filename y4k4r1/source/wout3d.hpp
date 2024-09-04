@@ -8,16 +8,26 @@
 // assets
 #include "wout_head_low_bin.h"
 #include "wout_bust.h"
+#include "wout_cape_bin.h"
+#include "wout_cape.h"
+#include "wout_bust.h"
+
+#include "mp3_bin.h"
+#include "mp3.h"
 
 
 
 namespace wout_bust {
 
     int ry = -90;
+    int rr = 0;
+
+    NE_Material *material;
+
     void load_assets(scene_data *scene) {
         scene->wout_head = NE_ModelCreate(NE_Static);
 
-        NE_Material *material = NE_MaterialCreate();
+        material = NE_MaterialCreate();
         // Load mesh from RAM and assign it to the object "Model".
         NE_ModelLoadStaticMesh(scene->wout_head, wout_head_low_bin);
         // Load a RGB texture from RAM and assign it to "Material".
@@ -36,9 +46,18 @@ namespace wout_bust {
     }
 
 
-    void update_draw(scene_data *scene, uint32_t keys_held) {
+    void update_draw(scene_data *scene, uint32_t keys_held, uint32_t keys_down) {
 
+        touchPosition touch;
+        touchRead(&touch);
 
+        float spawnZ = touch.rawx / ( (float) SCREEN_WIDTH / 32);
+
+        printf("\n \n %f",  spawnZ);
+
+        if (keys_held & KEY_TOUCH) {
+            ry = spawnZ + 110;
+        }
 
         if (keys_held & KEY_LEFT) {
             ry--;
@@ -47,8 +66,25 @@ namespace wout_bust {
             ry++;
         }
 
-        NE_ModelScale(scene->wout_head, 20, 20, 20);
+        if (keys_down & KEY_UP) {
+            NE_ModelLoadStaticMesh(scene->wout_head, wout_head_low_bin);
+            NE_MaterialTexLoad(material, NE_RGB5, 256, 256, NE_TEXGEN_TEXCOORD, wout_bustBitmap);
+            NE_ModelSetMaterial(scene->wout_head, material);
+        }
+        if (keys_down & KEY_DOWN) {
+            NE_ModelLoadStaticMesh(scene->wout_head, wout_cape_bin);
+            NE_MaterialTexLoad(material, NE_RGB5, 256, 256, NE_TEXGEN_TEXCOORD, wout_capeBitmap);
+            NE_ModelSetMaterial(scene->wout_head, material);
+        }
+
+
+
+        ry+= 2;
+
+//        NE_ModelScale(scene->wout_head, 20, 20, 20);
+        NE_ModelScale(scene->wout_head, 10, 10, 10);
         NE_ModelSetCoord(scene->wout_head, 2,-3,0);
+//        NE_ModelSetCoord(scene->wout_head, -4,-12,0);
         NE_ModelSetRot(scene->wout_head, 0, ry, 0);
         NE_PolyFormat(31, scene->wout_head_poly_id, NE_LIGHT_0, NE_CULL_BACK, NE_FOG_ENABLE);
         NE_ModelDraw(scene->wout_head);
