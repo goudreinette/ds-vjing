@@ -5,18 +5,7 @@
 #include <filesystem.h>
 #include <nf_lib.h>
 
-// First you have to put the .bin files in the data folder. This will generate
-// (after doing "make") some files named "binfilename_bin.h". For example,
-// "model.bin" will generate a file named "model_bin.h". You have to include
-// this in "main.c".
-//
-// The name you will have to use is "binfilename_bin". For example, for loading
-// "model.bin" you will have to use:
-//
-//     NE_ModelLoadStaticMesh(Model, binfilename_bin);
-//
-
-
+// Models and graphics
 #include "clippy_bin.h"
 #include "cloud_bin.h"
 #include "paper_bin.h"
@@ -24,6 +13,7 @@
 #include "rainbow.h"
 #include "texture3.h"
 #include "paper.h"
+
 
 // The time
 double t;
@@ -216,7 +206,6 @@ int main(int argc, char *argv[])
     // NE_ClearColorSet(RGB8(69,40,60), 31, 63);
     NE_ClearColorSet(RGB8(95,205,228), 31, 63);
 
-
     // NE_ClearColorSet(NE_White, 31, 63);
     // setBackdropColorSub(RGB8(34,32,52));
     setBackdropColorSub(RGB8(95,205,228));
@@ -237,7 +226,7 @@ int main(int argc, char *argv[])
 
 
 
-// Enable/update fog
+    // Enable/update fog
     NE_FogEnable(shift, NE_White, 31, mass, depth);
 
     NE_SpecialEffectNoiseConfig(31);
