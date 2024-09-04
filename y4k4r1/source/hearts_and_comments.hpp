@@ -56,17 +56,17 @@ namespace hearts_and_comments {
             heart { .x = 0, .y = 0, .z = 3},
             heart { .x = 0, .y = 1, .z = 5},
 
-            heart { .x = -1, .y = 4.3, .z = 3},
-            heart { .x = -2, .y = 6.5, .z = -2},
-            heart { .x = -1.5, .y = 2.2, .z = -1},
-            heart { .x = -2.5, .y = 7.8, .z = -0},
-            heart { .x = -1, .y = 3.9, .z = -2},
-            heart { .x = 2, .y = 2.1, .z = -4},
-            heart { .x = 1, .y = 7.3, .z = 3},
-            heart { .x = 3, .y = 3.2, .z = 3},
-            heart { .x = 4, .y = 9.8, .z = 2},
-            heart { .x = 5, .y = .5, .z = 1},
-            heart { .x = 3, .y = .2, .z = 4}
+//            heart { .x = -1, .y = 4.3, .z = 3},
+//            heart { .x = -2, .y = 6.5, .z = -2},
+//            heart { .x = -1.5, .y = 2.2, .z = -1},
+//            heart { .x = -2.5, .y = 7.8, .z = -0},
+//            heart { .x = -1, .y = 3.9, .z = -2},
+//            heart { .x = 2, .y = 2.1, .z = -4},
+//            heart { .x = 1, .y = 7.3, .z = 3},
+//            heart { .x = 3, .y = 3.2, .z = 3},
+//            heart { .x = 4, .y = 9.8, .z = 2},
+//            heart { .x = 5, .y = .5, .z = 1},
+//            heart { .x = 3, .y = .2, .z = 4}
     };
 
     void load_assets(scene_data *scene) {

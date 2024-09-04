@@ -18,6 +18,9 @@
 #include "hearts_and_comments.hpp"
 #include "wout3d.hpp"
 #include "mic.hpp"
+#include "bullettime.hpp"
+#include "bullethell.hpp"
+#include "hyperdrive.hpp"
 
 
 void draw_3d_scene(void *arg)
