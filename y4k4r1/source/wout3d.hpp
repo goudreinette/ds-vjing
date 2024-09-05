@@ -7,7 +7,6 @@
 
 // assets
 #include "wout_head_low_bin.h"
-#include "wout_bust.h"
 #include "wout_cape_bin.h"
 #include "wout_cape.h"
 #include "wout_bust.h"

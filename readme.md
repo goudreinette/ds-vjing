@@ -27,6 +27,11 @@ chokidar "source/**.c" -c "make" --initial true
 ```
 
 
+```
+chokidar "source/**.*" "graphics/**.png" "models/**.obj" "assets.sh" -c "sh assets.sh && make" --initial true
+```
+
+
 32 x 32 tiles in a 256px map
 
 first rows, then columns

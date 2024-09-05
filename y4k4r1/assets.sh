@@ -50,6 +50,21 @@ python3 $OBJ2DL \
     --output data/swf.bin \
     --texture 256 256
 
+python3 $OBJ2DL \
+    --input ./models/trein.obj \
+    --output data/trein.bin \
+    --texture 256 256
+
+python3 $OBJ2DL \
+    --input ./models/track.obj \
+    --output data/track.bin \
+    --texture 256 256
+
+python3 $OBJ2DL \
+    --input ./models/ground.obj \
+    --output data/ground.bin \
+    --texture 256 256
+
 
 # for background in assets/affine-bgs/*.png; do
 #     grit $background -ftb -fh! -gb -gB16

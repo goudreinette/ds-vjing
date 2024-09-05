@@ -19,14 +19,11 @@
 
 namespace hearts_and_comments {
     struct heart {
-        float x;
-        float y;
-        float z;
+        float x, y, z;
         int ry, rx, rz;
 
         float s = 0;
-        float vx = 0;
-        float vy = 0;
+        float vx = 0, vy = 0;
 
         NE_Model *model;
     };
@@ -84,8 +81,7 @@ namespace hearts_and_comments {
         NE_ModelLoadStaticMesh(scene->heart, heart_bin);
         NE_ModelLoadStaticMesh(scene->mp3, mp3_bin);
         NE_ModelLoadStaticMesh(scene->swf, swf_bin);
-        // Load a RGB texture from RAM and assign it to "Material".
-//        NE_MaterialTexLoad(material_heart, NE_RGB5, 256, 256, NE_TEXGEN_TEXCOORD, heartBitmap);
+
         NE_MaterialTexLoad(material_mp3, NE_RGB5, 256, 256, NE_TEXGEN_TEXCOORD, mp3Bitmap);
 
         // Assign texture to model...
@@ -100,24 +96,10 @@ namespace hearts_and_comments {
                                  RGB15(0, 0, 0),    // Specular
                                  RGB15(5, 5, 5),    // Emission
                                  false, true);     // Vertex color, use shininess table
-
-//        NE_MaterialSetProperties(material_mp3,
-//                                 RGB15(31, 31, 31), // Diffuse
-//                                 RGB15(15, 15, 15), // Ambient
-//                                 RGB15(31, 31, 31),    // Specular
-//                                 RGB15(0, 0, 0),    // Emission
-//                                 false, true);     // Vertex color, use shininess table
     }
 
 
     void update_draw_hearts(scene_data *scene, uint32_t keys_held) {
-        // Draw heart ------
-        int y = sinf(t / 30) * .2;
-        int ry = sinf(t / 120) * 40;
-
-        printf("\x1b[2;1Hy4k4r1");
-        printf("\x1b[5;1H<3<3<3<3<3<3");
-
         touchPosition touch;
         touchRead(&touch);
 

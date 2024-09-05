@@ -14,7 +14,6 @@ float lerp(float a, float b, float f)
     return a * (1.0 - f) + (b * f);
 }
 
-
 // map function cpp
 float map(float x, float in_min, float in_max, float out_min, float out_max) {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
@@ -23,6 +22,8 @@ int map(int x, int in_min, int in_max, int out_min, int out_max) {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
+
+
 struct scene_data {
     NE_Camera *camera;
 
@@ -30,7 +31,16 @@ struct scene_data {
     int heart_poly_id;
     NE_Model *mp3;
     NE_Model *swf;
+    NE_Model *trein;
     int mp3_poly_id;
+    int trein_poly_id;
+
+    NE_Model *track;
+    int track_poly_id;
+
+    NE_Model *ground;
+    int ground_poly_id;
+
 
     NE_Model *wout_head;
     int wout_head_poly_id;
