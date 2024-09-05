@@ -41,16 +41,24 @@ void draw_3d_scene(void *arg) {
     printf("\x1b[2;1Hy4k4r1");
     printf("\x1b[5;1H<3<3<3<3<3<3");
 
+    // controls
     if (keys_down & KEY_L) {
         trein_active = !trein_active;
         if (!trein_active) {
             trein::exit();
         }
     }
-
     if (keys_down & KEY_R) {
         storm_active = !storm_active;
     }
+    if (keys_held & KEY_UP) {
+        speed += 0.01;
+    }
+    if (keys_held & KEY_DOWN) {
+        speed -= 0.01;
+    }
+
+    printf("\n \n speed: %f", speed);
 
     // different scenes and features
     hearts_and_comments::update_draw_hearts(scene, keys_held);

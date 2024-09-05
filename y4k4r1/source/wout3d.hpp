@@ -18,7 +18,7 @@
 
 namespace wout_bust {
 
-    int ry = -90;
+    float ry = -90;
 
     NE_Material *material;
 
@@ -78,7 +78,7 @@ namespace wout_bust {
         }
 
         if (spinning) {
-            ry+= 2;
+            ry+= speed * 5;
         }
 
         NE_ModelScale(scene->wout_head, 10, 10, 10);

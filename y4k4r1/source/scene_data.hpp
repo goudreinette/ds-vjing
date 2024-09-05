@@ -11,6 +11,7 @@ NE_Material *material_mp3;
 double t;
 
 
+
 // camera
 float cam_y = 0.0;
 float cam_z = -10.0;
@@ -23,6 +24,9 @@ float target_cam_z = cam_z;
 
 bool trein_active = false;
 bool storm_active = false;
+
+float speed = 0.2;
+
 
 
 struct scene_data {

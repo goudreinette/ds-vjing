@@ -29,7 +29,6 @@ namespace trein {
     // ground
     int ground_start_z = 0;
 
-    float speed = 0.2;
 
     // lanes
     int distance = 6;
@@ -123,12 +122,7 @@ namespace trein {
             current_lane++;
         }
 
-        if (keys_held & KEY_UP) {
-            speed += 0.01;
-        }
-        if (keys_held & KEY_DOWN) {
-            speed -= 0.01;
-        }
+
 
         // auto switching lanes
         if (rand() % 150 == 1) {
@@ -163,7 +157,6 @@ namespace trein {
 
         printf("\n \n %i", cam_z_int);
         printf("\n \n %i", track_start_z);
-        printf("\n \n speed: %f", speed);
     }
 
     void exit() {
