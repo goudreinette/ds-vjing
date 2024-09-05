@@ -76,13 +76,11 @@ namespace hearts_and_comments {
         }
 
         NE_Material *material_heart = NE_MaterialCreate();
-        NE_Material *material_mp3 = NE_MaterialCreate();
         // Load mesh from RAM and assign it to the object "Model".
         NE_ModelLoadStaticMesh(scene->heart, heart_bin);
         NE_ModelLoadStaticMesh(scene->mp3, mp3_bin);
         NE_ModelLoadStaticMesh(scene->swf, swf_bin);
 
-        NE_MaterialTexLoad(material_mp3, NE_RGB5, 256, 256, NE_TEXGEN_TEXCOORD, mp3Bitmap);
 
         // Assign texture to model...
         NE_ModelSetMaterial(scene->heart, material_heart);

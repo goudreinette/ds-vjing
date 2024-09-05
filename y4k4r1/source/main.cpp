@@ -26,8 +26,7 @@
 
 
 
-void draw_3d_scene(void *arg)
-{
+void draw_3d_scene(void *arg) {
     scene_data *scene = (scene_data*) arg;
 
     NE_CameraUse(scene->camera);
@@ -39,7 +38,6 @@ void draw_3d_scene(void *arg)
     printf("\x1b[2;1Hy4k4r1");
     printf("\x1b[5;1H<3<3<3<3<3<3");
 
-
     // different scenes and features
 //    hearts_and_comments::update_draw_hearts(scene, keys_held);
 //    wout_bust::update_draw(scene, keys_held, keys_down);
@@ -47,13 +45,17 @@ void draw_3d_scene(void *arg)
 }
 
 
+void load_mp3_material() {
+    material_mp3 = NE_MaterialCreate();
+    NE_MaterialTexLoad(material_mp3, NE_RGB5, 256, 256, NE_TEXGEN_TEXCOORD, mp3Bitmap);
+    NE_MaterialSetProperties(material_mp3,RGB15(31, 31, 31),RGB15(15, 15, 15),RGB15(0, 0, 0),RGB15(0, 0, 0),false, false);
+}
 
 
-int main(int argc, char *argv[])
-{
+
+int main(int argc, char *argv[]) {
     nitroFSInit(NULL);
     NF_SetRootFolder("NITROFS");
-
 
     mic::setup();
 
@@ -70,11 +72,14 @@ int main(int argc, char *argv[])
     // Init Nitro Engine in normal 3D mode
     NE_Init3D();
 
+
     // libnds uses VRAM_C for the text console, reserve A and B only
     NE_TextureSystemReset(0, 0, NE_VRAM_AB);
     // Init console in non-3D screen
 
     // Setup models and scenes
+    load_mp3_material();
+
 //    hearts_and_comments::load_assets(&scene);
 //    wout_bust::load_assets(&scene);
     trein::load_assets(&scene);
