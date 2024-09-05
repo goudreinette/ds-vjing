@@ -28,8 +28,6 @@ namespace hearts_and_comments {
         NE_Model *model;
     };
 
-    bool particles = true;
-
     float scale_smoothed = 0;
     heart hearts[] = {
             heart { .x = 0, .y = 10, .z = -4},
@@ -71,7 +69,7 @@ namespace hearts_and_comments {
         scene->mp3 = NE_ModelCreate(NE_Static);
         scene->swf = NE_ModelCreate(NE_Static);
 
-        for (heart &h : hearts) {
+        for (heart &h: hearts) {
             h.model = scene->heart;
         }
 
@@ -83,19 +81,10 @@ namespace hearts_and_comments {
 
 
         // Assign texture to model...
-        NE_ModelSetMaterial(scene->heart, material_heart);
+        NE_ModelSetMaterial(scene->heart, material_mp3);
         NE_ModelSetMaterial(scene->mp3, material_mp3);
         NE_ModelSetMaterial(scene->swf, material_mp3);
-
-        // Set some properties to the material_heart
-        NE_MaterialSetProperties(material_heart,
-                                 RGB15(31, 5, 5), // Diffuse
-                                 RGB15(0, 0, 0), // Ambient
-                                 RGB15(0, 0, 0),    // Specular
-                                 RGB15(5, 5, 5),    // Emission
-                                 false, true);     // Vertex color, use shininess table
     }
-
 
     void update_draw_hearts(scene_data *scene, uint32_t keys_held) {
         touchPosition touch;
@@ -104,10 +93,6 @@ namespace hearts_and_comments {
         float spawnZ = touch.rawx / (float) SCREEN_WIDTH / 16.0 * 2 - 1;
         printf("\n \n %f",  spawnZ);
 
-        int down = keysDown();
-        if (down & KEY_A) {
-            particles = !particles;
-        }
 
         for (heart &h : hearts) {
             h.ry += 10;
@@ -126,10 +111,10 @@ namespace hearts_and_comments {
             h.x += h.vx;
 
             if (h.y < -7) {
-                if (particles) {
+                if (storm_active) {
                     h.s = 0;
-                    h.y = 7;
-                    h.x = 5;
+                    h.y = trein_active ? rand() % 4 + 2 : 7;
+                    h.x = cam_z + 15;
 
                     h.vy = ((float) (rand() % 10) / 100) * -1.0;
                     h.vx = -0.1;
@@ -151,14 +136,13 @@ namespace hearts_and_comments {
                 }
             }
 
-            if (cam_z < 10) {
+            if (h.x > cam_z) {
                 NE_ModelScale(h.model, h.s + scale_smoothed, h.s + scale_smoothed, h.s + scale_smoothed);
                 NE_ModelSetCoord(h.model, h.x, h.y, h.z);
                 NE_ModelSetRot(h.model, h.rx, h.ry, h.rz);
                 NE_PolyFormat(31, scene->heart_poly_id, NE_LIGHT_0, NE_CULL_BACK, NE_MODULATION);
                 NE_ModelDraw(h.model);
             }
-
         }
     }
 }

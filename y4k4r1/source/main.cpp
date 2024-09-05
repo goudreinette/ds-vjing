@@ -16,7 +16,7 @@
 
 // Includes
 #include "scene_data.hpp"
-#include "hearts_and_comments.hpp"
+#include "storm.hpp"
 #include "wout3d.hpp"
 #include "mic.hpp"
 #include "bullettime.hpp"
@@ -43,10 +43,13 @@ void draw_3d_scene(void *arg) {
 
     if (keys_down & KEY_L) {
         trein_active = !trein_active;
-
         if (!trein_active) {
             trein::exit();
         }
+    }
+
+    if (keys_down & KEY_R) {
+        storm_active = !storm_active;
     }
 
     // different scenes and features
@@ -73,7 +76,7 @@ void draw_3d_scene(void *arg) {
 void load_mp3_material() {
     material_mp3 = NE_MaterialCreate();
     NE_MaterialTexLoad(material_mp3, NE_RGB5, 256, 256, NE_TEXGEN_TEXCOORD, mp3Bitmap);
-    NE_MaterialSetProperties(material_mp3,RGB15(31, 31, 31),RGB15(15, 15, 15),RGB15(15, 15, 15),RGB15(15, 15, 15),false, false);
+    NE_MaterialSetProperties(material_mp3,RGB15(31, 31, 31),RGB15(5,5,5),RGB15(15, 15, 15),RGB15(15, 15, 15),false, false);
 }
 
 

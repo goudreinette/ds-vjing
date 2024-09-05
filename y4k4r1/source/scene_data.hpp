@@ -22,6 +22,7 @@ float target_cam_z = cam_z;
 
 
 bool trein_active = false;
+bool storm_active = false;
 
 
 struct scene_data {

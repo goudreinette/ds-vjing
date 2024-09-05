@@ -19,17 +19,20 @@
 
 
 namespace trein {
-    int distance = 6;
 
+    // tracks
     float track_height = -3;
     const int num_track_parts = 7;
     int track_gap = 7;
     int track_start_z = 0;
 
+    // ground
     int ground_start_z = 0;
 
     float speed = 0.2;
 
+    // lanes
+    int distance = 6;
     int current_lane = 1;
 
 
@@ -41,9 +44,9 @@ namespace trein {
     };
 
     train trains[] = {
-            train{.z = 50 + rand() % 20, .x = -distance}, // left
-            train{.z =  50 + rand() % 20, .x = 0}, // center
-            train{.z =  50 + rand() % 20, .x = distance} // right
+        train{.z = 50 + rand() % 20, .x = -distance}, // left
+        train{.z =  50 + rand() % 20, .x = 0}, // center
+        train{.z =  50 + rand() % 20, .x = distance} // right
     };
 
     void load_assets(scene_data *scene) {
@@ -97,17 +100,16 @@ namespace trein {
         }
 
 
-        // draw trcins
+        // draw trains
+        NE_PolyFormat(31, scene->trein_poly_id, NE_LIGHT_0, NE_CULL_BACK, NE_FOG_ENABLE);
+
         for (train &t: trains) {
             t.z += -0.3 - speed / 4;
-
 
             // respawn in the distance
             if (t.z < cam_z - 10) {
                 t.z = cam_z + 50 + rand() % 20;
             }
-
-            NE_PolyFormat(31, scene->trein_poly_id, NE_LIGHT_0, NE_CULL_BACK, NE_FOG_ENABLE);
 
             NE_ModelSetCoord(scene->trein, t.z, -3, t.x);
             NE_ModelDraw(scene->trein);
@@ -175,5 +177,5 @@ namespace trein {
             t.z = 50 + rand() % 20;
         }
     }
-    
+
 }
