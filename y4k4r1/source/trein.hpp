@@ -62,14 +62,23 @@ namespace trein {
 
 
     float cam_y;
-    float cam_z = -10;
+    float cam_z = 0;
+    float cam_x = 0;
 
-    void update_draw(scene_data *scene, uint32_t keys_held) {
+    int current_lane = 1;
+
+    void update_draw(scene_data *scene, uint32_t keys_held, uint32_t keys_down) {
+        // scrolllll
+//        cam_z += 0.1;
+
+
+        NE_ClearColorSet(RGB8(95,205,228), 31, 63);
+
         NE_ModelScale(scene->trein, 2, 2, 2);
         NE_ModelSetRot(scene->trein, 0, 130, 0);
 
+        NE_ModelScale(scene->ground, 5 + cam_z, 5, 10);
         NE_ModelSetCoord(scene->ground, 5,-3.1,0);
-        NE_ModelScale(scene->ground, 5, 5, 10);
         NE_ModelDraw(scene->ground);
 
         for (train &t: trains) {
@@ -87,41 +96,51 @@ namespace trein {
             NE_PolyFormat(31, scene->track_poly_id, NE_LIGHT_0, NE_CULL_BACK, NE_FOG_ENABLE);
 
             int track_height = -3;
-//            NE_ModelSetCoord(scene->track, 45, track_height, t.x);
-//            NE_ModelDraw(scene->track);
-//            NE_ModelSetCoord(scene->track, 38, track_height, t.x);
-//            NE_ModelDraw(scene->track);
-//            NE_ModelSetCoord(scene->track, 31, track_height, t.x);
-//            NE_ModelDraw(scene->track);
-            NE_ModelSetCoord(scene->track, 24, track_height, t.x - .125);
-            NE_ModelDraw(scene->track);
-            NE_ModelSetCoord(scene->track, 17, track_height, t.x- .125);
-            NE_ModelDraw(scene->track);
-            NE_ModelSetCoord(scene->track, 10, track_height, t.x- .125);
-            NE_ModelDraw(scene->track);
-            NE_ModelSetCoord(scene->track, 3.2, track_height, t.x- .125);
-            NE_ModelDraw(scene->track);
-            NE_ModelSetCoord(scene->track, -4, track_height, t.x- .125);
-            NE_ModelDraw(scene->track);
+            for (int track_i = 0; track_i < 6; ++track_i) {
+                NE_ModelSetCoord(scene->track, cam_z - 5 + track_i * 7, track_height, t.x- .125);
+                NE_ModelDraw(scene->track);
+            }
         }
 
 
 
-        train center_train = trains[1];
         float target_cam_y;
+        float target_cam_x;
+
+        if (keys_down & KEY_LEFT && current_lane > -1) {
+             current_lane--;
+        }
+        if (keys_down & KEY_RIGHT  && current_lane < 1) {
+            current_lane++;
+        }
+
+        train center_train = trains[current_lane + 1];
 
         if (center_train.z < 10) {
-            target_cam_y = 4;
+            target_cam_y = 2.5;
         } else {
-            target_cam_y = -2;
+            target_cam_y = -2.5;
+        }
+
+        if (current_lane == -1) {
+            target_cam_x = -distance;
+        } else if (current_lane == 0) {
+            target_cam_x = 0;
+        } else if (current_lane == 1) {
+            target_cam_x = distance;
         }
 
         printf("\n \n %f",  cam_y);
+//        printf("\n \n %f",  center_train.z);
+        printf("\n \n %f",  cam_z);
+//        printf("\n \n %i",  current_lane);
+
         cam_y = lerp(cam_y, target_cam_y, 0.1);
+        cam_x = lerp(cam_x, target_cam_x, 0.1);
 
         NE_CameraSet(scene->camera,
-                     -10, cam_y, 0,  // Position
-                     0, 0, 0,  // Look at
+                     cam_z - 10, cam_y, cam_x,  // Position
+                     cam_z, 0, cam_x,  // Look at
                      0, 1, 0); // Up direction
     }
 }

@@ -43,7 +43,7 @@ void draw_3d_scene(void *arg)
     // different scenes and features
 //    hearts_and_comments::update_draw_hearts(scene, keys_held);
 //    wout_bust::update_draw(scene, keys_held, keys_down);
-    trein::update_draw(scene, keys_held);
+    trein::update_draw(scene, keys_held, keys_down);
 }
 
 
@@ -94,7 +94,6 @@ int main(int argc, char *argv[])
 
     // NE_ClearColorSet(RGB8(69,40,60), 31, 63);
 //    NE_ClearColorSet(RGB8(95,205,228), 31, 63);
-    NE_ClearColorSet(RGB8(95,205,228), 31, 63);
 
     // NE_ClearColorSet(NE_White, 31, 63);
     // setBackdropColorSub(RGB8(34,32,52));
