@@ -23,6 +23,7 @@ namespace wout_bust {
     NE_Material *material;
 
     bool is_caped = false;
+    bool spinning = false;
 
     void load_assets(scene_data *scene) {
         scene->wout_head = NE_ModelCreate(NE_Static);
@@ -59,31 +60,27 @@ namespace wout_bust {
             ry = spawnZ + 110;
         }
 
-        if (keys_held & KEY_LEFT) {
-            ry--;
-        }
-        if (keys_held & KEY_RIGHT) {
-            ry++;
+        if (keys_down & KEY_B) {
+            spinning = !spinning;
         }
 
-        if (keys_down & KEY_UP) {
+        if (keys_down & KEY_LEFT) {
             is_caped = false;
             NE_ModelLoadStaticMesh(scene->wout_head, wout_head_low_bin);
             NE_MaterialTexLoad(material, NE_RGB5, 256, 256, NE_TEXGEN_TEXCOORD, wout_bustBitmap);
             NE_ModelSetMaterial(scene->wout_head, material);
         }
-        if (keys_down & KEY_DOWN) {
+        if (keys_down & KEY_RIGHT) {
             is_caped = true;
             NE_ModelLoadStaticMesh(scene->wout_head, wout_cape_bin);
             NE_MaterialTexLoad(material, NE_RGB5, 256, 256, NE_TEXGEN_TEXCOORD, wout_capeBitmap);
             NE_ModelSetMaterial(scene->wout_head, material);
         }
 
+        if (spinning) {
+            ry+= 2;
+        }
 
-
-        ry+= 2;
-
-//        NE_ModelScale(scene->wout_head, 20, 20, 20);
         NE_ModelScale(scene->wout_head, 10, 10, 10);
         if (is_caped) {
             NE_ModelSetCoord(scene->wout_head, -4,-12,0);
@@ -91,8 +88,10 @@ namespace wout_bust {
             NE_ModelSetCoord(scene->wout_head, 2,-3,0);
         }
 
-        NE_ModelSetRot(scene->wout_head, 0, ry, 0);
-        NE_PolyFormat(31, scene->wout_head_poly_id, NE_LIGHT_0, NE_CULL_BACK, NE_FOG_ENABLE);
-        NE_ModelDraw(scene->wout_head);
+        if (cam_z < 10) {
+            NE_ModelSetRot(scene->wout_head, 0, ry, 0);
+            NE_PolyFormat(31, scene->wout_head_poly_id, NE_LIGHT_0, NE_CULL_BACK, NE_FOG_ENABLE);
+            NE_ModelDraw(scene->wout_head);
+        }
     }
 }

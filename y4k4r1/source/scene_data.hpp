@@ -11,6 +11,19 @@ NE_Material *material_mp3;
 double t;
 
 
+// camera
+float cam_y = 0.0;
+float cam_z = -10.0;
+float cam_x = 0.0;
+
+float target_cam_y = cam_y;
+float target_cam_x = cam_x;
+float target_cam_z = cam_z;
+
+
+bool trein_active = false;
+
+
 struct scene_data {
     NE_Camera *camera;
 

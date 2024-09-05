@@ -22,16 +22,13 @@ namespace trein {
     int distance = 6;
 
     float track_height = -3;
-    const int num_track_parts = 6;
+    const int num_track_parts = 7;
     int track_gap = 7;
     int track_start_z = 0;
 
     int ground_start_z = 0;
 
     float speed = 0.2;
-    float cam_y;
-    float cam_z = -10.0;
-    float cam_x = 0.0;
 
     int current_lane = 1;
 
@@ -64,11 +61,11 @@ namespace trein {
         NE_ModelSetMaterial(scene->ground, material_mp3);
     }
 
+    // camera and lanes
+
 
     void update_draw(scene_data *scene, uint32_t keys_held, uint32_t keys_down) {
         cam_z += speed;
-
-        NE_ClearColorSet(RGB8(95, 205, 228), 31, 63);
 
         NE_ModelScale(scene->trein, 2, 2, 2);
         NE_ModelSetRot(scene->trein, 0, 130, 0);
@@ -116,11 +113,6 @@ namespace trein {
             NE_ModelDraw(scene->trein);
         }
 
-
-        // camera and lanes
-        float target_cam_y;
-        float target_cam_x;
-
         // controls
         if (keys_down & KEY_LEFT && current_lane > -1) {
             current_lane--;
@@ -137,7 +129,7 @@ namespace trein {
         }
 
         // auto switching lanes
-        if (rand() % 200 == 1) {
+        if (rand() % 150 == 1) {
             int ii = rand() % 2;
             if (ii == 0 && current_lane > -1) {
                 current_lane--;
@@ -163,10 +155,6 @@ namespace trein {
             target_cam_x = distance;
         }
 
-//        printf("\n \n %f",  cam_y);
-//        printf("\n \n %f",  center_train.z);
-//        printf("\n \n %f",  cam_z);
-//        printf("\n \n %i",  current_lane);
         float lerp_speed = map(speed, 0.0, 3.0, 0.1, 0.6);
         cam_y = lerp(cam_y, target_cam_y, lerp_speed);
         cam_x = lerp(cam_x, target_cam_x, lerp_speed);
@@ -174,10 +162,18 @@ namespace trein {
         printf("\n \n %i", cam_z_int);
         printf("\n \n %i", track_start_z);
         printf("\n \n speed: %f", speed);
-
-        NE_CameraSet(scene->camera,
-                     cam_z, cam_y, cam_x,  // Position
-                     cam_z + 10, 0, cam_x,  // Look at
-                     0, 1, 0); // Up direction
     }
+
+    void exit() {
+        trein::track_start_z = 0;
+        trein::ground_start_z = 0;
+        target_cam_z = -10.0;
+        target_cam_x = 0.0;
+        target_cam_y = 0.0;
+
+        for (train &t : trains) {
+            t.z = 50 + rand() % 20;
+        }
+    }
+    
 }

@@ -26,29 +26,54 @@
 
 
 
+
+
 void draw_3d_scene(void *arg) {
     scene_data *scene = (scene_data*) arg;
 
     NE_CameraUse(scene->camera);
 
     scanKeys();
+
     uint32_t keys_held = keysHeld();
     uint32_t keys_down = keysDown();
 
     printf("\x1b[2;1Hy4k4r1");
     printf("\x1b[5;1H<3<3<3<3<3<3");
 
+    if (keys_down & KEY_L) {
+        trein_active = !trein_active;
+
+        if (!trein_active) {
+            trein::exit();
+        }
+    }
+
     // different scenes and features
-//    hearts_and_comments::update_draw_hearts(scene, keys_held);
-//    wout_bust::update_draw(scene, keys_held, keys_down);
-    trein::update_draw(scene, keys_held, keys_down);
+    hearts_and_comments::update_draw_hearts(scene, keys_held);
+    wout_bust::update_draw(scene, keys_held, keys_down);
+
+
+    if (trein_active) {
+        trein::update_draw(scene, keys_held, keys_down);
+    } else {
+        float lerp_speed = 0.2;
+        cam_y = lerp(cam_y, target_cam_y, lerp_speed);
+        cam_x = lerp(cam_x, target_cam_x, lerp_speed);
+        cam_z = lerp(cam_z, target_cam_z, lerp_speed);
+    }
+
+    NE_CameraSet(scene->camera,
+                 cam_z, cam_y, cam_x,  // Position
+                 cam_z + 10, 0, cam_x,  // Look at
+                 0, 1, 0); // Up direction
 }
 
 
 void load_mp3_material() {
     material_mp3 = NE_MaterialCreate();
     NE_MaterialTexLoad(material_mp3, NE_RGB5, 256, 256, NE_TEXGEN_TEXCOORD, mp3Bitmap);
-    NE_MaterialSetProperties(material_mp3,RGB15(31, 31, 31),RGB15(15, 15, 15),RGB15(0, 0, 0),RGB15(0, 0, 0),false, false);
+    NE_MaterialSetProperties(material_mp3,RGB15(31, 31, 31),RGB15(15, 15, 15),RGB15(15, 15, 15),RGB15(15, 15, 15),false, false);
 }
 
 
@@ -72,16 +97,15 @@ int main(int argc, char *argv[]) {
     // Init Nitro Engine in normal 3D mode
     NE_Init3D();
 
-
     // libnds uses VRAM_C for the text console, reserve A and B only
     NE_TextureSystemReset(0, 0, NE_VRAM_AB);
-    // Init console in non-3D screen
 
+    // Init console in non-3D screen
     // Setup models and scenes
     load_mp3_material();
 
-//    hearts_and_comments::load_assets(&scene);
-//    wout_bust::load_assets(&scene);
+    hearts_and_comments::load_assets(&scene);
+    wout_bust::load_assets(&scene);
     trein::load_assets(&scene);
 
 
@@ -95,20 +119,15 @@ int main(int argc, char *argv[]) {
 
     // We set up a light and its color
     NE_LightSet(0, NE_White, -0.5, -0.5, -0.5);
-//    NE_LightSet(2, NE_White, -1, -3, -0.5);
+//    setBackdropColorSub(RGB8(95,205,228)); // light
 
-    // NE_ClearColorSet(RGB8(69,40,60), 31, 63);
-//    NE_ClearColorSet(RGB8(95,205,228), 31, 63);
-
-    // NE_ClearColorSet(NE_White, 31, 63);
-    // setBackdropColorSub(RGB8(34,32,52));
-    setBackdropColorSub(RGB8(95,205,228));
 
     consoleDemoInit();
     // Wrap values of parameters
 
     // Enable/update fog
-    NE_FogEnable(2, RGB8(95,205,228), 31, 4, 0x7C00);
+//    NE_FogEnable(2, RGB8(95,205,228), 31, 4, 0x7C00);
+    NE_FogEnable(2, RGB8(0,0,0), 31, 5, 0x7C00);
 
 //    NE_SpecialEffectNoiseConfig(31);
     // NE_SpecialEffectSet(NE_NOISE);

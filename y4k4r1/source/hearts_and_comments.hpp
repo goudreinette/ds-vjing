@@ -109,13 +109,6 @@ namespace hearts_and_comments {
             particles = !particles;
         }
 
-
-//        float scale = map(mic::peak, 0, 32768, 0.1, 5.0);
-//        scale_smoothed = lerp(scale, scale_smoothed, 0.5);
-//
-//        printf("\n \n %f",  scale_smoothed);
-
-
         for (heart &h : hearts) {
             h.ry += 10;
             h.rx += rand() % 10;
@@ -129,9 +122,6 @@ namespace hearts_and_comments {
                 h.s += 0.01;
             }
 
-            if (particles) {
-
-            }
             h.y += h.vy;
             h.x += h.vx;
 
@@ -161,15 +151,13 @@ namespace hearts_and_comments {
                 }
             }
 
-//            if (particles) {
+            if (cam_z < 10) {
                 NE_ModelScale(h.model, h.s + scale_smoothed, h.s + scale_smoothed, h.s + scale_smoothed);
                 NE_ModelSetCoord(h.model, h.x, h.y, h.z);
                 NE_ModelSetRot(h.model, h.rx, h.ry, h.rz);
-//                NE_PolyFormat(0, scene->heart_poly_id, NE_LIGHT_ALL, NE_CULL_NONE, NE_MODULATION);
                 NE_PolyFormat(31, scene->heart_poly_id, NE_LIGHT_0, NE_CULL_BACK, NE_MODULATION);
                 NE_ModelDraw(h.model);
-//            }
-
+            }
 
         }
     }
